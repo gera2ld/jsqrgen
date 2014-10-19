@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+	<head>
+		<title>QRCode</title>
+		<script type=text/javascript src=jsqrcode.min.js></script>
+	</head>
+	<body>
+		<img id=qrimg src=monkey_24.png>
+		<textarea id=qrtext>http://geraldl.net</textarea>
+		<button id=qrgen>Generate</button>
+		<div id=qrcode></div>
+		<script>
+			function getColor(qrcode,i,j) {
+				var n=qrcode.getModuleCount(),
+						li=n-i-1,lj=n-j-1;
+				if(i>1&&i<5&&j>1&&j<5
+					||i>1&&i<5&&lj>1&&lj<5
+					||li>1&&li<5&&j>1&&j<5) return 'midnightblue';
+				else if(i<7&&j<7||i<7&&lj<7||li<7&&j<7) return 'indianred';
+				else return 'royalblue';
+			}
+			document.getElementById('qrgen').onclick=function(){
+				var q=document.getElementById('qrcode');
+				q.innerHTML='';
+				qrcode(q,{
+					tileWidth:4,
+					tileHeight:4,
+					colorDark:getColor,
+					image:document.getElementById('qrimg'),
+					text:document.getElementById('qrtext').value,
+				});
+			};
+		</script>
+	</body>
+</html>
