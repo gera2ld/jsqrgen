@@ -2,33 +2,49 @@
 <html>
 	<head>
 		<title>QRCode</title>
-		<script type=text/javascript src=jsqrcode.min.js></script>
+	<script type="text/javascript" src="http://sandbox.runjs.cn/uploads/rs/142/gjxgxu0g/jsqrcode.min.js"></script>
+		<style>body{background:wheat;}</style>
 	</head>
 	<body>
-		<img id=qrimg src=monkey_24.png>
-		<textarea id=qrtext>http://geraldl.net</textarea>
-		<button id=qrgen>Generate</button>
+		<h1>QRCode Generator</h1>
+		<div>Image: <img id=qrimg src=monkey_24.png></div>
+		<div>Text: <textarea id=qrtext>http://geraldl.net</textarea></div>
+		<div>Size: <input id=tileSize type=range min=2 max=8 value=4></div>
+		<div>
+			Foreground color: <input id=colorFore type=color value=#4169e1>
+			Background color: <input id=colorBack type=color value=#ffffff><br>
+			Outside-border color: <input id=colorOut type=color value=#cd5c5c>
+			Inside-border color: <input id=colorIn type=color value=#191970>
+		</div>
+		<button id=qrgen>Generate</button> <a target=_blank href=https://github.com/gera2ld/jsqrcode>Visit Github</a>
 		<div id=qrcode></div>
 		<script>
+		(function($){
+			var cF=$('#colorFore').value,
+					cB=$('#colorBack').value,
+					cO=$('#colorOut').value,
+					cI=$('#colorIn').value;
 			function getColor(n,i,j) {
 				var li=n-i-1,lj=n-j-1;
 				if(i>1&&i<5&&j>1&&j<5
 					||i>1&&i<5&&lj>1&&lj<5
-					||li>1&&li<5&&j>1&&j<5) return 'midnightblue';
-				else if(i<7&&j<7||i<7&&lj<7||li<7&&j<7) return 'indianred';
-				else return 'royalblue';
+					||li>1&&li<5&&j>1&&j<5) return cI;
+				else if(i<7&&j<7||i<7&&lj<7||li<7&&j<7) return cO;
+				else return cF;
 			}
-			document.getElementById('qrgen').onclick=function(){
-				var q=document.getElementById('qrcode');
+			$('#qrgen').onclick=function(){
+				var q=$('#qrcode'),s=$('#tileSize').value;
 				q.innerHTML='';
 				qrcode(q,{
-					tileWidth:4,
-					tileHeight:4,
+					tileWidth:s,
+					tileHeight:s,
 					colorDark:getColor,
-					image:document.getElementById('qrimg'),
-					text:document.getElementById('qrtext').value,
+					colorLight:cB,
+					image:$('#qrimg'),
+					text:$('#qrtext').value,
 				});
 			};
+		})(document.querySelector.bind(document));
 		</script>
 	</body>
 </html>
