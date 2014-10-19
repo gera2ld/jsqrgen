@@ -1,1 +1,1 @@
-uglifyjs src/qrcode.js src/jsqrcode.js -m -c -o build/jsqrcode.min.js --wrap
+uglifyjs src/qrcode.js src/qrgen.js -m -c -o build/qrgen.min.js --wrap
