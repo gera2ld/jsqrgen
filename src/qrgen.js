@@ -37,11 +37,12 @@ window.qrcode=function(container,options) {
 			ctx.fillRect(Math.round(j*tileWidth),Math.round(i*tileHeight),w,h);
 		}
 	if(image) {
-		w=image.clientWidth;h=image.clientHeight;
+		w=image.clientWidth;if(w/width>.3) w=width*.3;
+		h=image.clientHeight;if(h/height>.3) h=height*.3;
 		i=(width-w)/2;j=(height-h)/2;
 		ctx.fillStyle=getColor(colorLight,-1,-1);
 		ctx.fillRect(i-2,j-2,w+4,h+4);
-		ctx.drawImage(image,i,j);
+		ctx.drawImage(image,i,j,w,h);
 	}
 	container.appendChild(canvas);
 };
