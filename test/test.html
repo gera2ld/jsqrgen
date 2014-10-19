@@ -2,12 +2,16 @@
 <html>
 	<head>
 		<title>QRCode</title>
-		<script type="text/javascript" src="qrgen.min.js"></script>
-		<style>body{background:wheat;}</style>
+		<script type="text/javascript" src="../src/qrcode.js"></script>
+		<script type="text/javascript" src="../src/qrgen.js"></script>
+		<link type=text/css rel=stylesheet href=test.css>
 	</head>
 	<body>
 		<h1>QRCode Generator</h1>
-		<div>Image: <img id=qrimg src=monkey_24.png></div>
+		<div>
+			Image: <img id=qrimg src=monkey_24.png>
+			<input id=fimg type=file>
+		</div>
 		<div>Text: <textarea id=qrtext>http://geraldl.net</textarea></div>
 		<div>Size: <input id=tileSize type=range min=2 max=8 value=4></div>
 		<div>
@@ -18,33 +22,6 @@
 		</div>
 		<button id=qrgen>Generate</button> <a target=_blank href=https://github.com/gera2ld/jsqrgen>Visit Github</a>
 		<div id=qrcode></div>
-		<script>
-		(function($){
-			var cF=$('#colorFore').value,
-					cB=$('#colorBack').value,
-					cO=$('#colorOut').value,
-					cI=$('#colorIn').value;
-			function getColor(n,i,j) {
-				var li=n-i-1,lj=n-j-1;
-				if(i>1&&i<5&&j>1&&j<5
-					||i>1&&i<5&&lj>1&&lj<5
-					||li>1&&li<5&&j>1&&j<5) return cI;
-				else if(i<7&&j<7||i<7&&lj<7||li<7&&j<7) return cO;
-				else return cF;
-			}
-			$('#qrgen').onclick=function(){
-				var q=$('#qrcode'),s=$('#tileSize').value;
-				q.innerHTML='';
-				qrcode(q,{
-					tileWidth:s,
-					tileHeight:s,
-					colorDark:getColor,
-					colorLight:cB,
-					image:$('#qrimg'),
-					text:$('#qrtext').value,
-				});
-			};
-		})(document.querySelector.bind(document));
-		</script>
+		<script src=test.js></script>
 	</body>
 </html>
