@@ -1,1 +1,2 @@
 body{background:wheat;}
+body>div{display:inline-block;vertical-align:top;}

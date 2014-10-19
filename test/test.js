@@ -31,6 +31,7 @@
 			colorLight:cB,
 			image:$('#qrimg'),
 			text:$('#qrtext').value,
+			radius:$('#tileRadius').value,
 		});
 	};
 })(document.querySelector.bind(document));

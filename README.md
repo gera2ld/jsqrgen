@@ -49,5 +49,7 @@ Document
 	  the background color of a tile when it is not dark, default as *white*.
 	* *image*  
 	  an `img` element with a picture which is going to be shown in the middle of the QRCode canvas.
+	* *radius*  
+	  a ratio between 0 and 0.5, making tiles round with a border-radius of *radius* \* `tileWidth/tileHeight`.
 
 \* Both *colorDark* and *colorLight* can be a callable function, which will return a color, with *count_of_tiles_per_line*, *row_id*, *column_id* as the arguments, so that you may use different colors in different positions to make a characteristic QRCode.

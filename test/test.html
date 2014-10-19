@@ -7,20 +7,23 @@
 		<link type=text/css rel=stylesheet href=test.css>
 	</head>
 	<body>
-		<h1>QRCode Generator</h1>
 		<div>
-			Image: <img id=qrimg src=monkey_24.png>
-			<input id=fimg type=file>
+			<h1>QRCode Generator</h1>
+			<div>
+				Image: <img id=qrimg src=monkey_24.png>
+				<input id=fimg type=file>
+			</div>
+			<div>Text: <textarea id=qrtext>http://geraldl.net</textarea></div>
+			<div>Size: <input id=tileSize type=range min=2 max=10 value=6></div>
+			<div>Radius: <input id=tileRadius type=range min=0 max=.5 step=.05 value=0></div>
+			<div>
+				Foreground color: <input id=colorFore type=color value=#4169e1>
+				Background color: <input id=colorBack type=color value=#ffffff><br>
+				Outside-border color: <input id=colorOut type=color value=#cd5c5c>
+				Inside-border color: <input id=colorIn type=color value=#191970>
+			</div>
+			<button id=qrgen>Generate</button> <a target=_blank href=https://github.com/gera2ld/jsqrgen>Visit Github</a>
 		</div>
-		<div>Text: <textarea id=qrtext>http://geraldl.net</textarea></div>
-		<div>Size: <input id=tileSize type=range min=2 max=8 value=4></div>
-		<div>
-			Foreground color: <input id=colorFore type=color value=#4169e1>
-			Background color: <input id=colorBack type=color value=#ffffff><br>
-			Outside-border color: <input id=colorOut type=color value=#cd5c5c>
-			Inside-border color: <input id=colorIn type=color value=#191970>
-		</div>
-		<button id=qrgen>Generate</button> <a target=_blank href=https://github.com/gera2ld/jsqrgen>Visit Github</a>
 		<div id=qrcode></div>
 		<script src=test.js></script>
 	</body>
