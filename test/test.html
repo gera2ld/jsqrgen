@@ -10,9 +10,8 @@
 		<button id=qrgen>Generate</button>
 		<div id=qrcode></div>
 		<script>
-			function getColor(qrcode,i,j) {
-				var n=qrcode.getModuleCount(),
-						li=n-i-1,lj=n-j-1;
+			function getColor(n,i,j) {
+				var li=n-i-1,lj=n-j-1;
 				if(i>1&&i<5&&j>1&&j<5
 					||i>1&&i<5&&lj>1&&lj<5
 					||li>1&&li<5&&j>1&&j<5) return 'midnightblue';
