@@ -9,16 +9,16 @@ However, the generation is on a `canvas`, so the only requirement is that the br
 
 Usage
 ---
-After the main script (`jsqrcode.min.js`) is loaded, there will be a global function named `qrcode`.
+After the main script (`qrgen.min.js`) is loaded, there will be a global function named `qrcode`.
 
 Here is an example:
 
 ``` html
-<script type=text/javascript src=jsqrcode.min.js></script>
+<script type=text/javascript src=qrgen.min.js></script>
 <div id=qrcode></div>
 <script>
 window.qrcode(document.getElement('qrcode'),{
-	text:location.href
+	data:location.href
 });
 </script>
 ```
