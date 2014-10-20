@@ -27,7 +27,7 @@ Document
 ---
 *function* qrcode(*element*, *options*)
 
-* *element* is a DOM element to show the result canvas with an `appendChild` to it.
+* *element* is a DOM element to append the result canvas with an `appendChild` method.
 * *options* is an object with or without the attributes below (all attributes are optional):
 	* *data*  
 	  the **raw** data to be encoded in the QRCode.
@@ -42,16 +42,16 @@ Document
 	* *height*  
 	  the pixel height of the whole image, ignored if *tileHeight* is assigned.
 	* *typeNumber*  
-	  type number of the QRCode, default as -1.
+	  type number of the QRCode, default as `-1`.
 	* *correctLevel*  
 	  correct level of QRCode, default as *High level (30%)*.
 	* *colorDark* \*  
-	  the background color of a tile when it is dark, default as *black*.
+	  the background color of a tile when it is dark, default as `black`.
 	* *colorLight* \*  
-	  the background color of a tile when it is not dark, default as *white*.
+	  the background color of a tile when it is not dark, default as `white`.
 	* *image*  
 	  an `img` element with a picture which is going to be shown in the middle of the QRCode canvas.
 	* *radius*  
-	  a ratio between 0 and 0.5, making tiles round with a border-radius of *radius* \* `tileWidth/tileHeight`.
+	  a ratio between 0 and 0.5, making tiles round with a border-radius of `radius * [tileWidth|tileHeight]`.
 
-\* Both *colorDark* and *colorLight* can be a callable function, which will return a color, with *count_of_tiles_per_line*, *row_id*, *column_id* as the arguments, so that you may use different colors in different positions to make a characteristic QRCode.
+\* Both *colorDark* and *colorLight* can be a callable function, which will return a color, with `count_of_tiles_per_line, row_id, column_id` as the arguments, so that you may use different colors in different positions to make a characteristic QRCode.
