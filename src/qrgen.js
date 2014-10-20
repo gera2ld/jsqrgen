@@ -40,13 +40,13 @@ window.qrcode=function(container,options) {
 			correctLevel=options.correctLevel||QRErrorCorrectLevel.H,
 			colorDark=options.colorDark||'black',
 			colorLight=options.colorLight||'white',
-			text=options.text||'',
+			data=options.data||options.text||'',
 			image=options.image,
 			radius=options.radius,
 			i,j,canvas,qrcode,ctx,color,w,h,n;
 	if(radius<0||radius>.5) radius=0;
 	qrcode=new QRCode(typeNumber,correctLevel);
-	qrcode.addData(text);
+	qrcode.addData(data);
 	qrcode.make();
 	canvas=document.createElement('canvas');
 	n=qrcode.getModuleCount();

@@ -29,8 +29,10 @@ Document
 
 * *element* is a DOM element to show the result canvas with an `appendChild` to it.
 * *options* is an object with or without the attributes below (all attributes are optional):
-	* *text*  
-	  the **raw** text to be encoded in the QRCode.
+	* *data*  
+	  the **raw** data to be encoded in the QRCode.
+	* *text* (Deprecated)  
+	  if *data* is null, *text* will be checked for a compatible reason. If *text* is unicode, it should be encoded first.
 	* *tileWidth*  
 	  the pixel width of a tile.
 	* *tileHeight*  
