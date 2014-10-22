@@ -24,7 +24,8 @@ window.qrcode=function(container,options) {
 		function fillRect() {
 			ctx.fillRect(x,y,w,h);
 		}
-		var x=Math.round(j*tileWidth),y=Math.round(i*tileHeight),
+		var x=Math.round(j*tileWidth),
+				y=Math.round(i*tileHeight),
 				w=Math.ceil((j+1)*tileWidth)-Math.floor(j*tileWidth),
 				h=Math.ceil((i+1)*tileHeight)-Math.floor(i*tileHeight);
 		color=qrcode.isDark(i,j)?colorDark:colorLight;
@@ -44,11 +45,16 @@ window.qrcode=function(container,options) {
 			image=options.image,
 			radius=options.radius,
 			i,j,canvas,qrcode,ctx,color,w,h,n;
-	if(radius<0||radius>.5) radius=0;
+	// make sure radius=0 when isNaN(radius)
+	if(!(radius>0&&radius<.5)) radius=0;
+	// if an image is to be added, correctLevel is set to H
+	if(image) correctLevel=QRErrorCorrectLevel.H;
 	qrcode=new QRCode(typeNumber,correctLevel);
 	qrcode.addData(data);
 	qrcode.make();
 	canvas=document.createElement('canvas');
+	// use tileWidth and tileHeight if assigned
+	// otherwise width and height are used
 	n=qrcode.getModuleCount();
 	if(tileWidth) width=tileWidth*n;
 	else tileWidth=width/n;
@@ -56,15 +62,24 @@ window.qrcode=function(container,options) {
 	else tileHeight=height/n;
 	canvas.width=width;
 	canvas.height=height;
+	// draw QRCode
 	ctx=canvas.getContext('2d');
+	// clear the canvas with the background color
 	ctx.fillStyle=getColor(colorLight,-1,-1);
 	ctx.fillRect(0,0,width,height);
+	// draw each tile of the QRCode
 	for(i=0;i<n;i++)
 		for(j=0;j<n;j++) fillTile(i,j);
+	// draw image
 	if(image) {
-		w=image.clientWidth;if(w/width>.3) w=width*.3;
-		h=image.clientHeight;if(h/height>.3) h=height*.3;
-		i=(width-w)/2;j=(height-h)/2;
+		// limit the image size
+		i=.3;
+		w=image.clientWidth;
+		if(w/width>i) w=width*i;
+		h=image.clientHeight;
+		if(h/height>i) h=height*i;
+		i=(width-w)/2;
+		j=(height-h)/2;
 		ctx.fillStyle=getColor(colorLight,-1,-1);
 		ctx.fillRect(i-2,j-2,w+4,h+4);
 		ctx.drawImage(image,i,j,w,h);
