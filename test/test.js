@@ -45,16 +45,36 @@ function utf8Encode(string) {
 		else return $('#colorFore').value;
 	}
 	$('#qrgen').onclick=function(){
-		var q=$('#qrcode'),s=$('#tileSize').value;
+		var q=$('#qrcode'),options,s=$('#tileSpecial').value/100;
 		q.innerHTML='';
-		qrcode(q,{
-			tileWidth:s,
-			tileHeight:s,
+		options={
 			colorDark:getColor,
 			colorLight:$('#colorBack').value,
-			image:$('#qrimg'),
+			image:{
+				dom:$('#qrimg'),
+				clearEdges:$('#qrclearedges').checked,
+			},
 			data:utf8Encode($('#qrtext').value),
-			radius:$('#tileRadius').value,
-		});
+		};
+		options.tileWidth=options.tileHeight=$('#tileSize').value;
+		if(s>0)
+			options.method={key:'tile',value:s};
+		else
+			options.method={key:'liquid',value:-s};
+		new QRCanvas(options).appendTo(q);
+	};
+	$('#tileSpecialStops').onclick=function(e){
+		var d=e.target.getAttribute('data'),s=$('#tileSpecial');
+		if(d) {
+			e.preventDefault();
+			switch(d) {
+				case 's':
+					s.value=0;break;
+				case 'l':
+					s.value=-50;break;
+				case 'r':
+					s.value=50;break;
+			}
+		}
 	};
 })(document.querySelector.bind(document));

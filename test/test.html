@@ -11,11 +11,22 @@
 			<h1>QRCode Generator</h1>
 			<div>
 				Image: <img id=qrimg src=monkey_24.png>
-				<input id=fimg type=file>
+				<label><input id=qrclearedges type=checkbox checked>Clear edges</label>
 			</div>
+			<div><input id=fimg type=file></div>
 			<div>Text: <textarea id=qrtext>http://geraldl.net</textarea></div>
 			<div>Size: <input id=tileSize type=range min=2 max=10 value=6></div>
-			<div>Radius: <input id=tileRadius type=range min=0 max=.5 step=.05 value=0></div>
+			<table>
+				<tr>
+					<td rowspan=2>Special:</td>
+					<td colspan=3><input id=tileSpecial type=range min=-50 max=50 step=5 value=0></td>
+				</tr>
+				<tr id=tileSpecialStops>
+					<td align=left><a href=# data=l>Liquid</a></td>
+					<td align=center><a href=# data=s>Square</a></td>
+					<td align=right><a href=# data=r>Round</a></td>
+				</tr>
+			</table>
 			<div>
 				Foreground color: <input id=colorFore type=color value=#4169e1>
 				Background color: <input id=colorBack type=color value=#ffffff><br>
