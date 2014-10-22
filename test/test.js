@@ -45,7 +45,7 @@ function utf8Encode(string) {
 		else return $('#colorFore').value;
 	}
 	$('#qrgen').onclick=function(){
-		var q=$('#qrcode'),options,s=$('#tileSpecial').value/100;
+		var q=$('#qrcode'),options,s=$('#tileEffect').value/100;
 		q.innerHTML='';
 		options={
 			colorDark:getColor,
@@ -58,13 +58,13 @@ function utf8Encode(string) {
 		};
 		options.tileWidth=options.tileHeight=$('#tileSize').value;
 		if(s>0)
-			options.method={key:'tile',value:s};
+			options.effect={key:'round',value:s};
 		else
-			options.method={key:'liquid',value:-s};
+			options.effect={key:'liquid',value:-s};
 		new QRCanvas(options).appendTo(q);
 	};
-	$('#tileSpecialStops').onclick=function(e){
-		var d=e.target.getAttribute('data'),s=$('#tileSpecial');
+	$('#tileEffectStops').onclick=function(e){
+		var d=e.target.getAttribute('data'),s=$('#tileEffect');
 		if(d) {
 			e.preventDefault();
 			switch(d) {

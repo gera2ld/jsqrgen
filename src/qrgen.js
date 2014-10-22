@@ -23,8 +23,8 @@ function QRCanvas(options) {
 	t.image=options.image||{};
 	if(t.image.tagName) t.image={dom:t.image};
 	setDefaults(t.image,{clearEdges:true});
-	// method: {key: [liquid|tile], value: 0}
-	t.method=options.method||{};
+	// effect: {key: [round|liquid], value: 0}
+	t.effect=options.effect||{};
 	t.make();
 }
 QRCanvas.prototype={
@@ -120,7 +120,7 @@ QRCanvas.prototype={
 				ctx.lineTo(x,y);
 			}
 		}
-		function drawTile(v) {
+		function drawRound(v) {
 			function fillTile(i,j) {
 				var tile=t.getTile(i,j),w=tile.width,h=tile.height,x=tile.x,y=tile.y,r=v*w,
 						colorDark=t.getColor(t.colorDark,i,j),colorLight=t.getColor(t.colorLight,i,j);
@@ -200,16 +200,16 @@ QRCanvas.prototype={
 			for(i=0;i<t.size;i++)
 				for(j=0;j<t.size;j++) fillTile(i,j);
 		}
-		var t=this,ctx=t.context,v=t.method.value;
+		var t=this,ctx=t.context,v=t.effect.value;
 		// clear the canvas with the background color
 		t.context.fillStyle=t.getColor(t.colorLight,-1,-1);
 		t.context.fillRect(0,0,t.width,t.height);
-		// draw qrcode according to this.method
-		switch(t.method.key) {
+		// draw qrcode according to this.effect
+		switch(t.effect.key) {
 			case 'liquid':
 				drawLiquid(v);break;
-			//case 'tile':
-			default: drawTile(v);
+			//case 'round':
+			default: drawRound(v);
 		}
 		// finally draw image
 		t.drawImage();

@@ -54,11 +54,10 @@ Document
     * *image*  
       An object with `dom` attribute as an `img` element to be shown in the middle of the canvas
       and optional `clearEdges` to choose whether to clear the tiles broken by the image.
-    * *method*  
-      An object with a `key` attribute to choose a drawing method, and `value` as a parameter.  
+    * *effect*  
+      An object with a `key` attribute to choose an effect, and `value` as a parameter.  
       `key` can be one of the below:
-      * `tile`  
-        This is the default choice when no valid key is assigned.  
+      * `round`  
         `value` is a ratio between 0 and 0.5, making tiles round with a border-radius of `value * [tileWidth|tileHeight]`.
       * `liquid`  
         `value` is a ratio between 0 and 0.5.
