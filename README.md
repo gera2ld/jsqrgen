@@ -15,9 +15,10 @@ Here is a simple example:
 <script type=text/javascript src=qrgen.min.js></script>
 <div id=qrcode></div>
 <script>
-window.appendQRCode(document.getElement('qrcode'),{
+var qrc=new QRCanvas({
 	data:location.href
 });
+qrc.appendTo(document.getElementById('qrcode'));
 </script>
 ```
 
@@ -27,8 +28,6 @@ For more details, please read the document below.
 
 Document
 ---
-
-###Functions
 
 * *function* QRCanvas(*options*)
 
@@ -48,7 +47,8 @@ Document
     * *typeNumber*  
       The type number of the QRCode, default as `-1`.
     * *correctLevel*  
-      The correct level of QRCode, default as `QRErrorCorrectLevel.H`.  
+      The correct level of QRCode, can be one of `['L','M','Q','H']`, default as `H`.
+			When *image* is assigned, *correctLevel* will be set to `H`.
     * *colorDark* \*  
       The background color of a tile when it is dark, default as `black`.
     * *colorLight* \*  
@@ -66,15 +66,3 @@ Document
         In this case, `value` is a ratio between 0 and 0.5, making tiles round with a border-radius of `value * [tileWidth|tileHeight]`.
 
   \* Both *colorDark* and *colorLight* can be a callable function, which will return a color, with `size_of_qrcode, row_id, column_id` as the arguments, so that you may use different colors in different positions to make a characteristic QRCode.
-
-* *function* appendQRCode(*element*, *options*)
-  * *element* is a DOM element to append the result canvas with an `appendChild` method.
-  * *options* is used to build a QRCanvas
-
-###Constants
-
-* *QRErrorCorrectLevel*
-  * L : 1
-  * M : 0
-  * Q : 3
-  * H : 2

@@ -14,7 +14,8 @@ function QRCanvas(options) {
 	t.width=options.width||256;
 	t.height=options.height||256;
 	t.typeNumber=options.typeNumber||-1;
-	t.correctLevel=options.correctLevel||QRErrorCorrectLevel.H;
+	// correctLevel can be 'L', 'M', 'Q' or 'H'
+	t.correctLevel=QRErrorCorrectLevel[options.correctLevel]||QRErrorCorrectLevel.H;
 	t.colorDark=options.colorDark||'black';
 	t.colorLight=options.colorLight||'white';
 	t.data=options.data||'';
@@ -147,10 +148,8 @@ QRCanvas.prototype={
 		// finally draw image
 		t.drawImage();
 	},
+	appendTo:function(dom) {
+		dom.appendChild(this.canvas);
+	}
 };
-window.QRErrorCorrectLevel=QRErrorCorrectLevel;
 window.QRCanvas=QRCanvas;
-window.appendQRCode=function(container,options) {
-	var qrcanvas=new QRCanvas(options);
-	container.appendChild(qrcanvas.canvas);
-};
