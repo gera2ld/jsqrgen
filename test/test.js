@@ -36,17 +36,13 @@ function utf8Encode(string) {
 			r.readAsDataURL(f[0]);
 		}
 	};
-	var cF=$('#colorFore').value,
-			cB=$('#colorBack').value,
-			cO=$('#colorOut').value,
-			cI=$('#colorIn').value;
 	function getColor(n,i,j) {
 		var li=n-i-1,lj=n-j-1;
 		if(i>1&&i<5&&j>1&&j<5
 			||i>1&&i<5&&lj>1&&lj<5
-			||li>1&&li<5&&j>1&&j<5) return cI;
-		else if(i<7&&j<7||i<7&&lj<7||li<7&&j<7) return cO;
-		else return cF;
+			||li>1&&li<5&&j>1&&j<5) return $('#colorIn').value;
+		else if(i<7&&j<7||i<7&&lj<7||li<7&&j<7) return $('#colorOut').value;
+		else return $('#colorFore').value;
 	}
 	$('#qrgen').onclick=function(){
 		var q=$('#qrcode'),s=$('#tileSize').value;
@@ -55,7 +51,7 @@ function utf8Encode(string) {
 			tileWidth:s,
 			tileHeight:s,
 			colorDark:getColor,
-			colorLight:cB,
+			colorLight:$('#colorBack').value,
 			image:$('#qrimg'),
 			data:utf8Encode($('#qrtext').value),
 			radius:$('#tileRadius').value,
