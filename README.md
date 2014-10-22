@@ -29,10 +29,8 @@ For more details, please read the document below.
 Document
 ---
 
-* *function* QRCanvas(*options*)
-
+* *function* QRCanvas(*options*)  
   This is called to build a QRCanvas object with a QRCode and a canvas built inside.
-
   * *options* is an object with or without the attributes below (all attributes are optional):
     * *data*  
       The **raw** data to be encoded in the QRCode, text should be encoded before calling.
@@ -48,7 +46,7 @@ Document
       The type number of the QRCode, default as `-1`.
     * *correctLevel*  
       The correct level of QRCode, can be one of `['L','M','Q','H']`, default as `H`.
-			When *image* is assigned, *correctLevel* will be set to `H`.
+      When *image* is assigned, *correctLevel* will be set to `H`.
     * *colorDark* \*  
       The background color of a tile when it is dark, default as `black`.
     * *colorLight* \*  
@@ -57,10 +55,8 @@ Document
       An object with `dom` attribute as an `img` element to be shown in the middle of the canvas
       and optional `clearEdges` to choose whether to clear the tiles broken by the image.
     * *method*  
-      An object with a `key` attribute to choose a drawing method, and `value` as a parameter.
-
+      An object with a `key` attribute to choose a drawing method, and `value` as a parameter.  
       `key` can be one of:
-
       * `tile`  
         This is also the default choice when no valid key is assigned.  
         In this case, `value` is a ratio between 0 and 0.5, making tiles round with a border-radius of `value * [tileWidth|tileHeight]`.
