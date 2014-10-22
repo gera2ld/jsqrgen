@@ -1,4 +1,4 @@
-JS QRCode
+JS QRGen
 ===
 
 This is a QRCode generator written in pure javascript, without any dependencies. (jQuery is not needed, either.)
@@ -56,9 +56,11 @@ Document
       and optional `clearEdges` to choose whether to clear the tiles broken by the image.
     * *method*  
       An object with a `key` attribute to choose a drawing method, and `value` as a parameter.  
-      `key` can be one of:
+      `key` can be one of the below:
       * `tile`  
-        This is also the default choice when no valid key is assigned.  
-        In this case, `value` is a ratio between 0 and 0.5, making tiles round with a border-radius of `value * [tileWidth|tileHeight]`.
+        This is the default choice when no valid key is assigned.  
+        `value` is a ratio between 0 and 0.5, making tiles round with a border-radius of `value * [tileWidth|tileHeight]`.
+      * `liquid`  
+        `value` is a ratio between 0 and 0.5.
 
   \* Both *colorDark* and *colorLight* can be a callable function, which will return a color, with `size_of_qrcode, row_id, column_id` as the arguments, so that you may use different colors in different positions to make a characteristic QRCode.

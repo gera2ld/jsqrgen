@@ -108,42 +108,106 @@ QRCanvas.prototype={
 			t.context.drawImage(t.image.dom,t.image.x,t.image.y,t.image.width,t.image.height);
 		}
 	},
+	isDark:function(i,j) {
+		var t=this;
+		return i>=0&&i<t.size&&j>=0&&j<t.size?t.qrcode.isDark(i,j):false;
+	},
 	draw:function() {
+		function drawCorner(xc,yc,x,y,r) {
+			if(r) ctx.arcTo(xc,yc,x,y,r);
+			else {
+				ctx.lineTo(xc,yc);
+				ctx.lineTo(x,y);
+			}
+		}
 		function drawTile(v) {
 			function fillTile(i,j) {
-				var tile=t.getTile(i,j);
-				color=t.qrcode.isDark(i,j)?t.colorDark:t.colorLight;
-				ctx.fillStyle=t.getColor(color,i,j);
+				var tile=t.getTile(i,j),w=tile.width,h=tile.height,x=tile.x,y=tile.y,r=v*w,
+						colorDark=t.getColor(t.colorDark,i,j),colorLight=t.getColor(t.colorLight,i,j);
 				if(v) {	// fill arc with border-radius=v
-					var w=tile.width,h=tile.height,x=tile.x,y=tile.y,r=v*w;
+					ctx.fillStyle=colorLight;
+					ctx.fillRect(x,y,w,h);
+					ctx.fillStyle=colorDark;
 					ctx.beginPath();
 					ctx.moveTo(x+v*w,y);
 					ctx.lineTo(x+(1-v)*w,y);
-					ctx.arcTo(x+w,y,x+w,y+v*h,r);
+					drawCorner(x+w,y,x+w,y+v*h,r);
 					ctx.lineTo(x+w,y+(1-v)*h);
-					ctx.arcTo(x+w,y+h,x+(1-v)*w,y+h,r);
+					drawCorner(x+w,y+h,x+(1-v)*w,y+h,r);
 					ctx.lineTo(x+v*w,y+h);
-					ctx.arcTo(x,y+h,x,y+(1-v)*h,r);
+					drawCorner(x,y+h,x,y+(1-v)*h,r);
 					ctx.lineTo(x,y+v*h);
-					ctx.arcTo(x,y,x+v*w,y,r);
+					drawCorner(x,y,x+v*w,y,r);
 					ctx.closePath();
 					ctx.fill();
-				} else	// fill rect
-					ctx.fillRect(tile.x,tile.y,tile.width,tile.height);
+				} else {	// fill rect
+					ctx.fillStyle=colorDark;
+					ctx.fillRect(x,y,w,h);
+				}
 			}
-			var ctx=t.context,i,j;
+			var i,j;
 			for(i=0;i<t.size;i++)
 				for(j=0;j<t.size;j++) fillTile(i,j);
 		}
-		var t=this;
+		function fillCorner(xs,ys,xc,yc,xd,yd,r) {
+			ctx.beginPath();
+			ctx.moveTo(xs,ys);
+			drawCorner(xc,yc,xd,yd,r);
+			ctx.lineTo(xc,yc);
+			ctx.lineTo(xs,ys);
+			ctx.closePath();
+			ctx.fill();
+		}
+		function drawLiquid(v) {
+			function fillTile(i,j) {
+				var tile=t.getTile(i,j),w=tile.width,h=tile.height,x=tile.x,y=tile.y,r=v*w,
+						colorDark=t.getColor(t.colorDark,i,j),colorLight=t.getColor(t.colorLight,i,j),
+						corners=[0,0,0,0];	// NW,NE,SE,SW
+				if(t.isDark(i-1,j)) {corners[0]++;corners[1]++;}
+				if(t.isDark(i+1,j)) {corners[2]++;corners[3]++;}
+				if(t.isDark(i,j-1)) {corners[0]++;corners[3]++;}
+				if(t.isDark(i,j+1)) {corners[1]++;corners[2]++;}
+				ctx.fillStyle=colorLight;
+				ctx.fillRect(x,y,w,h);
+				ctx.fillStyle=colorDark;
+				if(t.isDark(i,j)) {
+					if(t.isDark(i-1,j-1)) corners[0]++;
+					if(t.isDark(i-1,j+1)) corners[1]++;
+					if(t.isDark(i+1,j+1)) corners[2]++;
+					if(t.isDark(i+1,j-1)) corners[3]++;
+					ctx.beginPath();
+					ctx.moveTo(x+v*w,y);
+					ctx.lineTo(x+(1-v)*w,y);
+					drawCorner(x+w,y,x+w,y+v*h,corners[1]?0:r);
+					ctx.lineTo(x+w,y+(1-v)*h);
+					drawCorner(x+w,y+h,x+(1-v)*w,y+h,corners[2]?0:r);
+					ctx.lineTo(x+v*w,y+h);
+					drawCorner(x,y+h,x,y+(1-v)*h,corners[3]?0:r);
+					ctx.lineTo(x,y+v*h);
+					drawCorner(x,y,x+v*w,y,corners[0]?0:r);
+					ctx.closePath();
+					ctx.fill();
+				} else {
+					if(corners[0]==2) fillCorner(x,y+v*h,x,y,x+v*w,y,r);
+					if(corners[1]==2) fillCorner(x+(1-v)*w,y,x+w,y,x+w,y+v*h,r);
+					if(corners[2]==2) fillCorner(x+w,y+(1-v)*h,x+w,y+h,x+(1-v)*w,y+h,r);
+					if(corners[3]==2) fillCorner(x+v*w,y+h,x,y+h,x,y+(1-v)*h,r);
+				}
+			}
+			var i,j;
+			for(i=0;i<t.size;i++)
+				for(j=0;j<t.size;j++) fillTile(i,j);
+		}
+		var t=this,ctx=t.context,v=t.method.value;
 		// clear the canvas with the background color
 		t.context.fillStyle=t.getColor(t.colorLight,-1,-1);
 		t.context.fillRect(0,0,t.width,t.height);
 		// draw qrcode according to this.method
 		switch(t.method.key) {
-			case 'liquid':	// TODO
+			case 'liquid':
+				drawLiquid(v);break;
 			//case 'tile':
-			default: drawTile(t.method.value);
+			default: drawTile(v);
 		}
 		// finally draw image
 		t.drawImage();
