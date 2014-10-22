@@ -127,19 +127,21 @@ QRCanvas.prototype={
 				if(v) {	// fill arc with border-radius=v
 					ctx.fillStyle=colorLight;
 					ctx.fillRect(x,y,w,h);
-					ctx.fillStyle=colorDark;
-					ctx.beginPath();
-					ctx.moveTo(x+v*w,y);
-					ctx.lineTo(x+(1-v)*w,y);
-					drawCorner(x+w,y,x+w,y+v*h,r);
-					ctx.lineTo(x+w,y+(1-v)*h);
-					drawCorner(x+w,y+h,x+(1-v)*w,y+h,r);
-					ctx.lineTo(x+v*w,y+h);
-					drawCorner(x,y+h,x,y+(1-v)*h,r);
-					ctx.lineTo(x,y+v*h);
-					drawCorner(x,y,x+v*w,y,r);
-					ctx.closePath();
-					ctx.fill();
+					if(t.isDark(i,j)) {
+						ctx.fillStyle=colorDark;
+						ctx.beginPath();
+						ctx.moveTo(x+v*w,y);
+						ctx.lineTo(x+(1-v)*w,y);
+						drawCorner(x+w,y,x+w,y+v*h,r);
+						ctx.lineTo(x+w,y+(1-v)*h);
+						drawCorner(x+w,y+h,x+(1-v)*w,y+h,r);
+						ctx.lineTo(x+v*w,y+h);
+						drawCorner(x,y+h,x,y+(1-v)*h,r);
+						ctx.lineTo(x,y+v*h);
+						drawCorner(x,y,x+v*w,y,r);
+						ctx.closePath();
+						ctx.fill();
+					}
 				} else {	// fill rect
 					ctx.fillStyle=colorDark;
 					ctx.fillRect(x,y,w,h);
