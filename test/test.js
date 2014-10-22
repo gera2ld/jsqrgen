@@ -47,14 +47,17 @@ function utf8Encode(string) {
 	$('#qrgen').onclick=function(){
 		var q=$('#qrcode'),s=$('#tileSize').value;
 		q.innerHTML='';
-		qrcode(q,{
+		appendQRCode(q,{
 			tileWidth:s,
 			tileHeight:s,
 			colorDark:getColor,
 			colorLight:$('#colorBack').value,
-			image:$('#qrimg'),
+			image:{
+				dom:$('#qrimg'),
+				clearEdges:$('#qrclearedges').checked,
+			},
 			data:utf8Encode($('#qrtext').value),
-			radius:$('#tileRadius').value,
+			method:{key:'tile',value:$('#tileRadius').value},
 		});
 	};
 })(document.querySelector.bind(document));

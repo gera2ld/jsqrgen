@@ -11,8 +11,9 @@
 			<h1>QRCode Generator</h1>
 			<div>
 				Image: <img id=qrimg src=monkey_24.png>
-				<input id=fimg type=file>
+				<label><input id=qrclearedges type=checkbox checked>Clear edges</label>
 			</div>
+			<div><input id=fimg type=file></div>
 			<div>Text: <textarea id=qrtext>http://geraldl.net</textarea></div>
 			<div>Size: <input id=tileSize type=range min=2 max=10 value=6></div>
 			<div>Radius: <input id=tileRadius type=range min=0 max=.5 step=.05 value=0></div>
