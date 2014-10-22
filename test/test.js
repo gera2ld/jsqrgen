@@ -44,8 +44,17 @@ function utf8Encode(string) {
 		else if(i<7&&j<7||i<7&&lj<7||li<7&&j<7) return $('#colorOut').value;
 		else return $('#colorFore').value;
 	}
+	var q=$('#qrcode'),t=$('#tileEffect');
+	q.onclick=function(e){
+		if(e.target.tagName=='CANVAS') {
+			var a=document.createElement('a');
+			a.target='_blank';
+			a.href=e.target.toDataURL();
+			a.click();
+		}
+	};
 	$('#qrgen').onclick=function(){
-		var q=$('#qrcode'),options,s=$('#tileEffect').value/100;
+		var options,s=t.value/100;
 		q.innerHTML='';
 		options={
 			colorDark:getColor,
@@ -64,16 +73,16 @@ function utf8Encode(string) {
 		new QRCanvas(options).appendTo(q);
 	};
 	$('#tileEffectStops').onclick=function(e){
-		var d=e.target.getAttribute('data'),s=$('#tileEffect');
+		var d=e.target.getAttribute('data');
 		if(d) {
 			e.preventDefault();
 			switch(d) {
 				case 's':
-					s.value=0;break;
+					t.value=0;break;
 				case 'l':
-					s.value=-50;break;
+					t.value=-50;break;
 				case 'r':
-					s.value=50;break;
+					t.value=50;break;
 			}
 		}
 	};
