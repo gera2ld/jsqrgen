@@ -131,13 +131,9 @@ QRCanvas.prototype={
 						ctx.fillStyle=colorDark;
 						ctx.beginPath();
 						ctx.moveTo(x+v*w,y);
-						ctx.lineTo(x+(1-v)*w,y);
 						drawCorner(x+w,y,x+w,y+v*h,r);
-						ctx.lineTo(x+w,y+(1-v)*h);
 						drawCorner(x+w,y+h,x+(1-v)*w,y+h,r);
-						ctx.lineTo(x+v*w,y+h);
 						drawCorner(x,y+h,x,y+(1-v)*h,r);
-						ctx.lineTo(x,y+v*h);
 						drawCorner(x,y,x+v*w,y,r);
 						ctx.closePath();
 						ctx.fill();
@@ -179,13 +175,9 @@ QRCanvas.prototype={
 					if(t.isDark(i+1,j-1)) corners[3]++;
 					ctx.beginPath();
 					ctx.moveTo(x+v*w,y);
-					ctx.lineTo(x+(1-v)*w,y);
 					drawCorner(x+w,y,x+w,y+v*h,corners[1]?0:r);
-					ctx.lineTo(x+w,y+(1-v)*h);
 					drawCorner(x+w,y+h,x+(1-v)*w,y+h,corners[2]?0:r);
-					ctx.lineTo(x+v*w,y+h);
 					drawCorner(x,y+h,x,y+(1-v)*h,corners[3]?0:r);
-					ctx.lineTo(x,y+v*h);
 					drawCorner(x,y,x+v*w,y,corners[0]?0:r);
 					ctx.closePath();
 					ctx.fill();
@@ -208,8 +200,10 @@ QRCanvas.prototype={
 		switch(t.effect.key) {
 			case 'liquid':
 				drawLiquid(v);break;
-			//case 'round':
-			default: drawRound(v);
+			case 'round':
+				drawRound(v);break;
+			default:
+				drawRound(0);
 		}
 		// finally draw image
 		t.drawImage();
