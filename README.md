@@ -32,27 +32,27 @@ Document
   * *options* is an object with or without the attributes below (all attributes are optional):
     * *data*  
       The **raw** data to be encoded in the QRCode, text should be encoded before calling.
-    * *tileSize* \*  
-      The pixel width or height of a tile.
+    * *cellSize* \*  
+      The pixel width or height of a cell.
     * *size* \*  
-      The pixel width or height of the entire image, ignored if *tileSize* is assigned.
+      The pixel width or height of the entire image, ignored if *cellSize* is assigned.
     * *typeNumber*  
       The type number of the QRCode, default as `-1`.
     * *correctLevel*  
       The correct level of QRCode, should be one of `['L','M','Q','H']`, default as `H`.  
       When *image* is assigned, *correctLevel* will be set to `H`.
     * *colorDark* \*\*  
-      The background color of a tile when it is dark, default as `black`.
+      The background color of a cell when it is dark, default as `black`.
     * *colorLight* \*\*  
-      The background color of a tile when it is not dark, default as `white`.
+      The background color of a cell when it is not dark, default as `white`.
     * *image*  
       An object with `dom` attribute as an `img` element to be shown in the middle of the canvas
-      and optional `clearEdges` to choose whether to clear the tiles broken by the image.
+      and optional `clearEdges` to choose whether to clear the cells broken by the image.
     * *effect*  
       An object with a `key` attribute to choose an effect, and `value` attribute as a parameter.  
       `key` can be `null` or one of the items below:
       * `round`  
-        `value` is a ratio between 0 and 0.5, making tiles round with a border-radius of `value * tileSize`.
+        `value` is a ratio between 0 and 0.5, making cells round with a border-radius of `value * cellSize`.
       * `liquid`  
         `value` is a ratio between 0 and 0.5.
 

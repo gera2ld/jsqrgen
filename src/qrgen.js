@@ -9,8 +9,13 @@ function setDefaults(dict,defaults) {
 function QRCanvas(options) {
 	var t=this;
 	// options
-	t.tileSize=options.tileSize||options.tileWidth||options.tileHeight;
-	t.size=options.size||options.width||options.height||256;
+	t.cellSize=options.cellSize
+		// compatible with tileWidth and tileHeight
+		||options.tileWidth||options.tileHeight;
+	t.size=options.size
+		// compatible with width and height
+		||options.width||options.height
+		||256;
 	t.typeNumber=options.typeNumber||4;
 	// correctLevel can be 'L', 'M', 'Q' or 'H'
 	t.correctLevel=options.correctLevel||'M';
@@ -33,12 +38,12 @@ QRCanvas.prototype={
 		t.qrcode=qrcode(t.typeNumber,t.correctLevel);
 		t.qrcode.addData(t.data);
 		t.qrcode.make();
-		// calculate QRCode and tile sizes
+		// calculate QRCode and cell sizes
 		t.count=t.qrcode.getModuleCount();
-		// tileSize is used if assigned
+		// cellSize is used if assigned
 		// otherwise size is used
-		if(t.tileSize) t.size=t.tileSize*t.count;
-		else t.tileSize=t.size/t.count;
+		if(t.cellSize) t.size=t.cellSize*t.count;
+		else t.cellSize=t.size/t.count;
 		// prepare image before drawing
 		t.prepareImage();
 		// make canvas
@@ -55,18 +60,18 @@ QRCanvas.prototype={
 		return {
 			row:row,
 			col:col,
-			x:Math.round(col*t.tileSize),
-			y:Math.round(row*t.tileSize),
+			x:Math.round(col*t.cellSize),
+			y:Math.round(row*t.cellSize),
 			// width and height are calculated to avoid small gaps
-			width:Math.ceil((col+1)*t.tileSize)-Math.floor(col*t.tileSize),
-			height:Math.ceil((row+1)*t.tileSize)-Math.floor(row*t.tileSize),
+			width:Math.ceil((col+1)*t.cellSize)-Math.floor(col*t.cellSize),
+			height:Math.ceil((row+1)*t.cellSize)-Math.floor(row*t.cellSize),
 		};
 	},
 	findTile:function(x,y) {
 		var t=this;
 		return {
-			row:Math.floor(y/t.tileSize),
-			col:Math.floor(x/t.tileSize),
+			row:Math.floor(y/t.cellSize),
+			col:Math.floor(x/t.cellSize),
 		};
 	},
 	prepareImage:function() {
@@ -85,10 +90,10 @@ QRCanvas.prototype={
 			t.image.outY=t.image.y-2;
 			t.image.outWidth=t.image.width+4;
 			t.image.outHeight=t.image.height+4;
-			// clear tiles broken by the image so that there will not be partial tiles
+			// clear cells broken by the image so that there will not be partial cells
 			if(t.image.clearEdges) {
-				t.image.tile1=t.findTile(t.image.outX,t.image.outY);
-				t.image.tile2=t.findTile(t.image.outX+t.image.outWidth,t.image.outY+t.image.outHeight);
+				t.image.cell1=t.findTile(t.image.outX,t.image.outY);
+				t.image.cell2=t.findTile(t.image.outX+t.image.outWidth,t.image.outY+t.image.outHeight);
 			}
 		}
 	},
@@ -105,9 +110,9 @@ QRCanvas.prototype={
 	isDark:function(i,j) {
 		var t=this,img=t.image;
 		return i>=0&&i<t.count&&j>=0&&j<t.count
-			&&(!(img.tile1&&img.tile2
-					 &&i>=img.tile1.row&&i<=img.tile2.row
-					 &&j>=img.tile1.col&&j<=img.tile2.col))
+			&&(!(img.cell1&&img.cell2
+					 &&i>=img.cell1.row&&i<=img.cell2.row
+					 &&j>=img.cell1.col&&j<=img.cell2.col))
 			?t.qrcode.isDark(i,j):false;
 	},
 	draw:function() {
@@ -120,13 +125,13 @@ QRCanvas.prototype={
 		}
 		function drawRound(r) {
 			function fillTile(i,j) {
-				var tile=t.getTile(i,j),w=tile.width,h=tile.height,x=tile.x,y=tile.y,
+				var cell=t.getTile(i,j),w=cell.width,h=cell.height,x=cell.x,y=cell.y,
 						colorDark=t.getColor(t.colorDark,i,j),colorLight=t.getColor(t.colorLight,i,j);
 				if(r) {	// fill arc with border-radius=r
-					// clear tile
+					// clear cell
 					ctx.fillStyle=colorLight;
 					ctx.fillRect(x,y,w,h);
-					// draw tile if it should be dark
+					// draw cell if it should be dark
 					if(t.isDark(i,j)) {
 						ctx.fillStyle=colorDark;
 						ctx.beginPath();
@@ -139,7 +144,7 @@ QRCanvas.prototype={
 						ctx.fill();
 					}
 				} else {	// fill rect
-					// tile will be filled with colorDark so no need to clear
+					// cell will be filled with colorDark so no need to clear
 					ctx.fillStyle=colorDark;
 					ctx.fillRect(x,y,w,h);
 				}
@@ -159,17 +164,17 @@ QRCanvas.prototype={
 		}
 		function drawLiquid(r) {
 			function fillTile(i,j) {
-				var tile=t.getTile(i,j),w=tile.width,h=tile.height,x=tile.x,y=tile.y,
+				var cell=t.getTile(i,j),w=cell.width,h=cell.height,x=cell.x,y=cell.y,
 						colorDark=t.getColor(t.colorDark,i,j),colorLight=t.getColor(t.colorLight,i,j),
 						corners=[0,0,0,0];	// NW,NE,SE,SW
 				if(t.isDark(i-1,j)) {corners[0]++;corners[1]++;}
 				if(t.isDark(i+1,j)) {corners[2]++;corners[3]++;}
 				if(t.isDark(i,j-1)) {corners[0]++;corners[3]++;}
 				if(t.isDark(i,j+1)) {corners[1]++;corners[2]++;}
-				// clear tile
+				// clear cell
 				ctx.fillStyle=colorLight;
 				ctx.fillRect(x,y,w,h);
-				// draw tile
+				// draw cell
 				ctx.fillStyle=colorDark;
 				if(t.isDark(i,j)) {
 					if(t.isDark(i-1,j-1)) corners[0]++;
@@ -196,7 +201,7 @@ QRCanvas.prototype={
 				for(j=0;j<t.count;j++) fillTile(i,j);
 		}
 		var t=this,ctx=t.context,
-				r=t.effect.value*t.tileSize;
+				r=t.effect.value*t.cellSize;
 		// draw qrcode according to this.effect
 		switch(t.effect.key) {
 			case 'liquid':
