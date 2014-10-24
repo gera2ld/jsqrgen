@@ -11,9 +11,9 @@ function QRCanvas(options) {
 	// options
 	t.tileSize=options.tileSize||options.tileWidth||options.tileHeight;
 	t.size=options.size||options.width||options.height||256;
-	t.typeNumber=options.typeNumber||-1;
+	t.typeNumber=options.typeNumber||4;
 	// correctLevel can be 'L', 'M', 'Q' or 'H'
-	t.correctLevel=QRErrorCorrectLevel[options.correctLevel]||QRErrorCorrectLevel.H;
+	t.correctLevel=options.correctLevel||'M';
 	t.colorDark=options.colorDark||'black';
 	t.colorLight=options.colorLight||'white';
 	t.data=options.data||'';
@@ -29,8 +29,8 @@ QRCanvas.prototype={
 	make:function() {
 		var t=this;
 		// if an image is to be added, correctLevel is set to H
-		if(t.image.dom) t.correctLevel=QRErrorCorrectLevel.H;
-		t.qrcode=new QRCode(t.typeNumber,t.correctLevel);
+		if(t.image.dom) t.correctLevel='H';
+		t.qrcode=qrcode(t.typeNumber,t.correctLevel);
 		t.qrcode.addData(t.data);
 		t.qrcode.make();
 		// calculate QRCode and tile sizes
@@ -70,7 +70,7 @@ QRCanvas.prototype={
 		};
 	},
 	prepareImage:function() {
-		var i=.3,j,t=this,image=t.image.dom,tile1,tile2;
+		var i=.3,j,t=this,image=t.image.dom;
 		if(image) {
 			// limit the image size
 			j=image.clientWidth;
@@ -87,10 +87,8 @@ QRCanvas.prototype={
 			t.image.outHeight=t.image.height+4;
 			// clear tiles broken by the image so that there will not be partial tiles
 			if(t.image.clearEdges) {
-				tile1=t.findTile(t.image.outX,t.image.outY);
-				tile2=t.findTile(t.image.outX+t.image.outWidth,t.image.outY+t.image.outHeight);
-				for(i=tile1.row;i<=tile2.row;i++)
-					for(j=tile1.col;j<=tile2.col;j++) t.qrcode.modules[i][j]=0;
+				t.image.tile1=t.findTile(t.image.outX,t.image.outY);
+				t.image.tile2=t.findTile(t.image.outX+t.image.outWidth,t.image.outY+t.image.outHeight);
 			}
 		}
 	},
@@ -105,8 +103,12 @@ QRCanvas.prototype={
 		}
 	},
 	isDark:function(i,j) {
-		var t=this;
-		return i>=0&&i<t.count&&j>=0&&j<t.count?t.qrcode.isDark(i,j):false;
+		var t=this,img=t.image;
+		return i>=0&&i<t.count&&j>=0&&j<t.count
+			&&(!(img.tile1&&img.tile2
+					 &&i>=img.tile1.row&&i<=img.tile2.row
+					 &&j>=img.tile1.col&&j<=img.tile2.col))
+			?t.qrcode.isDark(i,j):false;
 	},
 	draw:function() {
 		function drawCorner(xc,yc,x,y,r) {

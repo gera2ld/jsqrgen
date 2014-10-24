@@ -34,7 +34,7 @@ Document
       The **raw** data to be encoded in the QRCode, text should be encoded before calling.
     * *tileSize* \*  
       The pixel width or height of a tile.
-    * *size*  
+    * *size* \*  
       The pixel width or height of the entire image, ignored if *tileSize* is assigned.
     * *typeNumber*  
       The type number of the QRCode, default as `-1`.
