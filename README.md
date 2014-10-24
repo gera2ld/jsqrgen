@@ -46,8 +46,13 @@ Document
     * *colorLight* \*\*  
       The background color of a cell when it is not dark, default as `white`.
     * *image*  
-      An object with `dom` attribute as an `img` element to be shown in the middle of the canvas
-      and optional `clearEdges` to choose whether to clear the cells broken by the image.
+      An object with attributes listed below (all optional):
+			* `dom`  
+			  An `img` element with the image to be drawn in the middle of the canvas.
+			* `clearEdges`  
+				A boolean to decide whether to clear the cells broken by the image, default as `true`.
+			* `margin`  
+			  The pixel gap between the image and the QRCode cells around it, default as `2`.
     * *effect*  
       An object with a `key` attribute to choose an effect, and `value` attribute as a parameter.  
       `key` can be `null` or one of the items below:

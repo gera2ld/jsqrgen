@@ -25,7 +25,7 @@ function QRCanvas(options) {
 	// image: {dom: <img> object, clearEdges: bool}
 	t.image=options.image||{};
 	if(t.image.tagName) t.image={dom:t.image};
-	setDefaults(t.image,{clearEdges:true});
+	setDefaults(t.image,{clearEdges:true,margin:2});
 	// effect: {key: [round|liquid], value: 0}
 	t.effect=options.effect||{};
 	t.make();
@@ -75,44 +75,49 @@ QRCanvas.prototype={
 		};
 	},
 	prepareImage:function() {
-		var i=.3,j,t=this,image=t.image.dom;
-		if(image) {
+		var w,h,nw,nh,t=this,image=t.image,k;
+		if(k=image.dom) {
 			// limit the image size
-			j=image.clientWidth;
-			if(j/t.size>i) j=t.size*i;
-			t.image.width=j;
-			j=image.clientHeight;
-			if(j/t.size>i) j=t.size*i;
-			t.image.height=j;
-			t.image.x=(t.size-t.image.width)/2;
-			t.image.y=(t.size-t.image.height)/2;
-			t.image.outX=t.image.x-2;
-			t.image.outY=t.image.y-2;
-			t.image.outWidth=t.image.width+4;
-			t.image.outHeight=t.image.height+4;
-			// clear cells broken by the image so that there will not be partial cells
-			if(t.image.clearEdges) {
-				t.image.cell1=t.findTile(t.image.outX,t.image.outY);
-				t.image.cell2=t.findTile(t.image.outX+t.image.outWidth,t.image.outY+t.image.outHeight);
+			w=k.naturalWidth||k.width;
+			h=k.naturalHeight||k.height;
+			// calculate the number of cells to be broken or covered by the image
+			k=w/h;
+			nh=Math.floor(Math.sqrt(Math.min(w*h/t.size/t.size,.1)/k)*t.count);
+			nw=Math.floor(k*nh);
+			// (t.count-[nw|nh]) must be even if the image is in the middle
+			if((t.count-nw)%2) nw++;
+			if((t.count-nh)%2) nh++;
+			// calculate the final width and height of the image
+			k=Math.min((nh*t.cellSize-2*image.margin)/h,(nw*t.cellSize-2*image.margin)/w,1);
+			image.width=k*w;
+			image.height=k*h;
+			image.x=(t.size-image.width)/2;
+			image.y=(t.size-image.height)/2;
+			// whether to clear cells broken by the image (incomplete cells)
+			if(image.clearEdges) {
+				image.row1=Math.floor((t.count-nh)/2);
+				image.row2=image.row1+nh-1;
+				image.col1=Math.floor((t.count-nw)/2);
+				image.col2=image.col1+nw-1;
+			} else {
+				image.row1=image.col1=image.row2=image.col2=-1;
 			}
 		}
 	},
 	drawImage:function() {
-		var t=this,image=t.image.dom;
-		if(image) {
-			if(!t.image.clearEdges) {
+		var t=this,image=t.image;
+		if(image.dom) {
+			if(!image.clearEdges) {
 				t.context.fillStyle=t.getColor(t.colorLight,-1,-1);
-				t.context.fillRect(t.image.outX,t.image.outY,t.image.outWidth,t.image.outHeight);
+				t.context.fillRect(image.x-image.margin,image.y-image.margin,image.width+2*image.margin,image.height+2*image.margin);
 			}
-			t.context.drawImage(t.image.dom,t.image.x,t.image.y,t.image.width,t.image.height);
+			t.context.drawImage(image.dom,image.x,image.y,image.width,image.height);
 		}
 	},
 	isDark:function(i,j) {
 		var t=this,img=t.image;
 		return i>=0&&i<t.count&&j>=0&&j<t.count
-			&&(!(img.cell1&&img.cell2
-					 &&i>=img.cell1.row&&i<=img.cell2.row
-					 &&j>=img.cell1.col&&j<=img.cell2.col))
+			&&(!(i>=img.row1&&i<=img.row2&&j>=img.col1&&j<=img.col2))
 			?t.qrcode.isDark(i,j):false;
 	},
 	draw:function() {
