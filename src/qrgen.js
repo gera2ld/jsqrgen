@@ -9,10 +9,8 @@ function setDefaults(dict,defaults) {
 function QRCanvas(options) {
 	var t=this;
 	// options
-	t.tileWidth=options.tileWidth;
-	t.tileHeight=options.tileHeight;
-	t.width=options.width||256;
-	t.height=options.height||256;
+	t.tileSize=options.tileSize||options.tileWidth||options.tileHeight;
+	t.size=options.size||options.width||options.height||256;
 	t.typeNumber=options.typeNumber||-1;
 	// correctLevel can be 'L', 'M', 'Q' or 'H'
 	t.correctLevel=QRErrorCorrectLevel[options.correctLevel]||QRErrorCorrectLevel.H;
@@ -36,41 +34,39 @@ QRCanvas.prototype={
 		t.qrcode.addData(t.data);
 		t.qrcode.make();
 		// calculate QRCode and tile sizes
-		t.size=t.qrcode.getModuleCount();
-		// tileWidth and tileHeight are used if assigned
-		// otherwise width and height are used
-		if(t.tileWidth) t.width=t.tileWidth*t.size;
-		else t.tileWidth=t.width/t.size;
-		if(t.tileHeight) t.height=t.tileHeight*t.size;
-		else t.tileHeight=t.height/t.size;
+		t.count=t.qrcode.getModuleCount();
+		// tileSize is used if assigned
+		// otherwise size is used
+		if(t.tileSize) t.size=t.tileSize*t.count;
+		else t.tileSize=t.size/t.count;
 		// prepare image before drawing
 		t.prepareImage();
 		// make canvas
 		t.canvas=document.createElement('canvas');
-		t.canvas.width=t.width;
-		t.canvas.height=t.height;
+		t.canvas.width=t.canvas.height=t.size;
 		t.context=t.canvas.getContext('2d');
 		t.draw();
 	},
 	getColor:function(color,row,col) {
-		return typeof color=='function'?color(this.size,row,col):color;
+		return typeof color=='function'?color(this.count,row,col):color;
 	},
 	getTile:function(row,col) {
 		var t=this;
 		return {
 			row:row,
 			col:col,
-			x:Math.round(col*t.tileWidth),
-			y:Math.round(row*t.tileHeight),
-			width:Math.ceil((col+1)*t.tileWidth)-Math.floor(col*t.tileWidth),
-			height:Math.ceil((row+1)*t.tileHeight)-Math.floor(row*t.tileHeight),
+			x:Math.round(col*t.tileSize),
+			y:Math.round(row*t.tileSize),
+			// width and height are calculated to avoid small gaps
+			width:Math.ceil((col+1)*t.tileSize)-Math.floor(col*t.tileSize),
+			height:Math.ceil((row+1)*t.tileSize)-Math.floor(row*t.tileSize),
 		};
 	},
 	findTile:function(x,y) {
 		var t=this;
 		return {
-			row:Math.floor(y/t.tileHeight),
-			col:Math.floor(x/t.tileWidth),
+			row:Math.floor(y/t.tileSize),
+			col:Math.floor(x/t.tileSize),
 		};
 	},
 	prepareImage:function() {
@@ -78,13 +74,13 @@ QRCanvas.prototype={
 		if(image) {
 			// limit the image size
 			j=image.clientWidth;
-			if(j/t.width>i) j=t.width*i;
+			if(j/t.size>i) j=t.size*i;
 			t.image.width=j;
 			j=image.clientHeight;
-			if(j/t.height>i) j=t.height*i;
+			if(j/t.size>i) j=t.size*i;
 			t.image.height=j;
-			t.image.x=(t.width-t.image.width)/2;
-			t.image.y=(t.height-t.image.height)/2;
+			t.image.x=(t.size-t.image.width)/2;
+			t.image.y=(t.size-t.image.height)/2;
 			t.image.outX=t.image.x-2;
 			t.image.outY=t.image.y-2;
 			t.image.outWidth=t.image.width+4;
@@ -110,7 +106,7 @@ QRCanvas.prototype={
 	},
 	isDark:function(i,j) {
 		var t=this;
-		return i>=0&&i<t.size&&j>=0&&j<t.size?t.qrcode.isDark(i,j):false;
+		return i>=0&&i<t.count&&j>=0&&j<t.count?t.qrcode.isDark(i,j):false;
 	},
 	draw:function() {
 		function drawCorner(xc,yc,x,y,r) {
@@ -147,8 +143,8 @@ QRCanvas.prototype={
 				}
 			}
 			var i,j;
-			for(i=0;i<t.size;i++)
-				for(j=0;j<t.size;j++) fillTile(i,j);
+			for(i=0;i<t.count;i++)
+				for(j=0;j<t.count;j++) fillTile(i,j);
 		}
 		function fillCorner(xs,ys,xc,yc,xd,yd,r) {
 			ctx.beginPath();
@@ -194,11 +190,11 @@ QRCanvas.prototype={
 				}
 			}
 			var i,j;
-			for(i=0;i<t.size;i++)
-				for(j=0;j<t.size;j++) fillTile(i,j);
+			for(i=0;i<t.count;i++)
+				for(j=0;j<t.count;j++) fillTile(i,j);
 		}
 		var t=this,ctx=t.context,
-				r=t.effect.value*Math.min(t.tileWidth,t.tileHeight);
+				r=t.effect.value*t.tileSize;
 		// draw qrcode according to this.effect
 		switch(t.effect.key) {
 			case 'liquid':

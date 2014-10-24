@@ -57,6 +57,7 @@ function utf8Encode(string) {
 		var options,s=t.value/100;
 		q.innerHTML='';
 		options={
+			tileSize:$('#tileSize').value,
 			colorDark:getColor,
 			colorLight:$('#colorBack').value,
 			image:{
@@ -65,7 +66,6 @@ function utf8Encode(string) {
 			},
 			data:utf8Encode($('#qrtext').value),
 		};
-		options.tileWidth=options.tileHeight=$('#tileSize').value;
 		if(s>0)
 			options.effect={key:'round',value:s};
 		else
