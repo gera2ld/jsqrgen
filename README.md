@@ -24,6 +24,8 @@ qrc.appendTo(document.getElementById('qrcode'));
 
 Check `test` folder for more advanced examples.
 
+[中文说明](http://geraldl.net/js/qrgen) [测试页面](http://geraldl.net/js/qrgen-test)
+
 Document
 ---
 
@@ -37,9 +39,9 @@ Document
     * *size* \*  
       The pixel width or height of the entire image, ignored if *cellSize* is assigned.
     * *typeNumber*  
-      The type number of the QRCode, default as `-1`.
+      The type number of the QRCode, may be one of `1..10`, default as `4`.
     * *correctLevel*  
-      The correct level of QRCode, should be one of `['L','M','Q','H']`, default as `H`.  
+      The correct level of QRCode, should be one of `['L','M','Q','H']`, default as `M`.  
       When *image* is assigned, *correctLevel* will be set to `H`.
     * *colorDark* \*\*  
       The background color of a cell when it is dark, default as `black`.
@@ -47,19 +49,19 @@ Document
       The background color of a cell when it is not dark, default as `white`.
     * *image*  
       An object with attributes listed below (all optional):
-			* `dom`  
-			  An `img` element with the image to be drawn in the middle of the canvas.
-			* `clearEdges`  
-				A boolean to decide whether to clear the cells broken by the image, default as `true`.
-			* `margin`  
-			  The pixel gap between the image and the QRCode cells around it, default as `2`.
+      * *dom*  
+        An `img` element with the image to be drawn in the middle of the canvas.
+      * *clearEdges*  
+        A boolean to decide whether to clear the cells broken by the image, default as `true`.
+      * *margin*  
+        The pixel gap between the image and the QRCode cells around it, default as `2`.
     * *effect*  
-      An object with a `key` attribute to choose an effect, and `value` attribute as a parameter.  
-      `key` can be `null` or one of the items below:
+      An object with a *key* attribute to choose an effect, and *value* attribute as a parameter.  
+      *key* can be `null` or one of the items below:
       * `round`  
-        `value` is a ratio between 0 and 0.5, making cells round with a border-radius of `value * cellSize`.
+        *value* is a ratio between 0 and 0.5, making cells round with a border-radius of *value* * `cellSize`.
       * `liquid`  
-        `value` is a ratio between 0 and 0.5.
+        *value* is a ratio between 0 and 0.5.
 
   \* Since *width* and *height* of a QRCode are always equal, we just need one of them, renaming to *size*.
 
