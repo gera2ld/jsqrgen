@@ -39,7 +39,7 @@ Document
     * *size* \*  
       The pixel width or height of the entire image, ignored if *cellSize* is assigned.
     * *typeNumber*  
-      The type number of the QRCode, may be one of `1..10`, default as `4`.
+      The type number of the QRCode, may be one of `1..10`. If set to `-1`, the smallest valid type number will be used, default as `-1`.
     * *correctLevel*  
       The correct level of QRCode, should be one of `['L','M','Q','H']`, default as `M`.  
       When *image* is assigned, *correctLevel* will be set to `H`.

@@ -44,6 +44,11 @@ var qrcode = function() {
 
 		var makeImpl = function(test, maskPattern) {
 
+			// createData first to check the _typeNumber
+			if (_dataCache == null) {
+				_dataCache = createData(_typeNumber, _errorCorrectLevel, _dataList);
+			}
+
 			_moduleCount = _typeNumber * 4 + 17;
 			_modules = function(moduleCount) {
 				var modules = new Array(moduleCount);
@@ -65,10 +70,6 @@ var qrcode = function() {
 
 			if (_typeNumber >= 7) {
 				setupTypeNumber(test);
-			}
-
-			if (_dataCache == null) {
-				_dataCache = createData(_typeNumber, _errorCorrectLevel, _dataList);
 			}
 
 			mapData(_dataCache, maskPattern);
@@ -331,32 +332,42 @@ var qrcode = function() {
 			return data;
 		};
 
+		/*
+		 * find the smallest valid typeNumber if typeNumber<0
+		 */
 		var createData = function(typeNumber, errorCorrectLevel, dataList) {
+			var test=typeNumber<0;
+			if(test) typeNumber=1;
+			
+			while(1) {
+				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
 
-			var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+				var buffer = qrBitBuffer();
 
-			var buffer = qrBitBuffer();
+				for (var i = 0; i < dataList.length; i += 1) {
+					var data = dataList[i];
+					buffer.put(data.getMode(), 4);
+					buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+					data.write(buffer);
+				}
 
-			for (var i = 0; i < dataList.length; i += 1) {
-				var data = dataList[i];
-				buffer.put(data.getMode(), 4);
-				buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
-				data.write(buffer);
+				// calc num max data.
+				var totalDataCount = 0;
+				for (var i = 0; i < rsBlocks.length; i += 1) {
+					totalDataCount += rsBlocks[i].dataCount;
+				}
+
+				if (buffer.getLengthInBits() > totalDataCount * 8) {
+					if(test&&typeNumber<10) typeNumber++;
+					else throw new Error('code length overflow. ('
+						+ buffer.getLengthInBits()
+						+ '>'
+						+ totalDataCount * 8
+						+ ')');
+				} else break;
 			}
 
-			// calc num max data.
-			var totalDataCount = 0;
-			for (var i = 0; i < rsBlocks.length; i += 1) {
-				totalDataCount += rsBlocks[i].dataCount;
-			}
-
-			if (buffer.getLengthInBits() > totalDataCount * 8) {
-				throw new Error('code length overflow. ('
-					+ buffer.getLengthInBits()
-					+ '>'
-					+ totalDataCount * 8
-					+ ')');
-			}
+			if(test) _typeNumber=typeNumber;
 
 			// end code
 			if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
