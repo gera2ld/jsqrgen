@@ -16,7 +16,7 @@ function QRCanvas(options) {
 		// compatible with width and height
 		||options.width||options.height
 		||256;
-	t.typeNumber=options.typeNumber||-1;
+	t.typeNumber=options.typeNumber||0;
 	// correctLevel can be 'L', 'M', 'Q' or 'H'
 	t.correctLevel=options.correctLevel||'M';
 	t.colorDark=options.colorDark||'black';

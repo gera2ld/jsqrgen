@@ -333,10 +333,10 @@ var qrcode = function() {
 		};
 
 		/*
-		 * find the smallest valid typeNumber if typeNumber<0
+		 * find the smallest valid typeNumber
 		 */
 		var createData = function(typeNumber, errorCorrectLevel, dataList) {
-			var test=typeNumber<0;
+			var test=typeNumber<1;
 			if(test) typeNumber=1;
 			
 			while(1) {
@@ -415,66 +415,6 @@ var qrcode = function() {
 
 		_this.make = function() {
 			makeImpl(false, getBestMaskPattern() );
-		};
-
-		_this.createTableTag = function(cellSize, margin) {
-
-			cellSize = cellSize || 2;
-			margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
-
-			var qrHtml = '';
-
-			qrHtml += '<table style="';
-			qrHtml += ' border-width: 0px; border-style: none;';
-			qrHtml += ' border-collapse: collapse;';
-			qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
-			qrHtml += '">';
-			qrHtml += '<tbody>';
-
-			for (var r = 0; r < _this.getModuleCount(); r += 1) {
-
-				qrHtml += '<tr>';
-
-				for (var c = 0; c < _this.getModuleCount(); c += 1) {
-					qrHtml += '<td style="';
-					qrHtml += ' border-width: 0px; border-style: none;';
-					qrHtml += ' border-collapse: collapse;';
-					qrHtml += ' padding: 0px; margin: 0px;';
-					qrHtml += ' width: ' + cellSize + 'px;';
-					qrHtml += ' height: ' + cellSize + 'px;';
-					qrHtml += ' background-color: ';
-					qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
-					qrHtml += ';';
-					qrHtml += '"/>';
-				}
-
-				qrHtml += '</tr>';
-			}
-
-			qrHtml += '</tbody>';
-			qrHtml += '</table>';
-
-			return qrHtml;
-		};
-
-		_this.createImgTag = function(cellSize, margin) {
-
-			cellSize = cellSize || 2;
-			margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
-
-			var size = _this.getModuleCount() * cellSize + margin * 2;
-			var min = margin;
-			var max = size - margin;
-
-			return createImgTag(size, size, function(x, y) {
-				if (min <= x && x < max && min <= y && y < max) {
-					var c = Math.floor( (x - min) / cellSize);
-					var r = Math.floor( (y - min) / cellSize);
-					return _this.isDark(r, c)? 0 : 1;
-				} else {
-					return 1;
-				}
-			} );
 		};
 
 		return _this;
