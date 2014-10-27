@@ -55,11 +55,11 @@ QRCanvas.prototype={
 	getColor:function(color,row,col) {
 		return typeof color=='function'?color(this.count,row,col):color;
 	},
-	getTile:function(row,col) {
+	getCell:function(row,col) {
 		var t=this;
 		return {
-			row:row,
-			col:col,
+			//row:row,
+			//col:col,
 			x:Math.round(col*t.cellSize),
 			y:Math.round(row*t.cellSize),
 			// width and height are calculated to avoid small gaps
@@ -67,13 +67,13 @@ QRCanvas.prototype={
 			height:Math.ceil((row+1)*t.cellSize)-Math.floor(row*t.cellSize),
 		};
 	},
-	findTile:function(x,y) {
+	/*findCell:function(x,y) {
 		var t=this;
 		return {
 			row:Math.floor(y/t.cellSize),
 			col:Math.floor(x/t.cellSize),
 		};
-	},
+	},*/
 	prepareImage:function() {
 		var w,h,nw,nh,t=this,image=t.image,k;
 		if(k=image.dom) {
@@ -128,37 +128,30 @@ QRCanvas.prototype={
 				ctx.lineTo(x,y);
 			}
 		}
-		function drawRound(r) {
-			function fillTile(i,j) {
-				var cell=t.getTile(i,j),w=cell.width,h=cell.height,x=cell.x,y=cell.y,
-						colorDark=t.getColor(t.colorDark,i,j),colorLight=t.getColor(t.colorLight,i,j);
-				if(r) {	// fill arc with border-radius=r
-					// clear cell
-					ctx.fillStyle=colorLight;
-					ctx.fillRect(x,y,w,h);
-					// draw cell if it should be dark
-					if(t.isDark(i,j)) {
-						ctx.fillStyle=colorDark;
-						ctx.beginPath();
-						ctx.moveTo(x+.5*w,y);
-						drawCorner(x+w,y,x+w,y+.5*h,r);
-						drawCorner(x+w,y+h,x+.5*w,y+h,r);
-						drawCorner(x,y+h,x,y+.5*h,r);
-						drawCorner(x,y,x+.5*w,y,r);
-						ctx.closePath();
-						ctx.fill();
-					}
-				} else {	// fill rect
-					// cell will be filled with colorDark so no need to clear
-					ctx.fillStyle=colorDark;
-					ctx.fillRect(x,y,w,h);
-				}
-			}
-			var i,j;
-			for(i=0;i<t.count;i++)
-				for(j=0;j<t.count;j++) fillTile(i,j);
+		function fillCell(colorLight) {
+			ctx.fillStyle=colorLight;
+			ctx.fillRect(cell.x,cell.y,cell.width,cell.height);
 		}
-		function fillCorner(xs,ys,xc,yc,xd,yd,r) {
+		function drawSquare() {
+			fillCell(t.isDark(i,j)?colorDark:colorLight);
+		}
+		function drawRound() {
+			// fill arc with border-radius=r
+			fillCell(colorLight);
+			// draw cell if it should be dark
+			if(t.isDark(i,j)) {
+				ctx.fillStyle=colorDark;
+				ctx.beginPath();
+				ctx.moveTo(x+.5*w,y);
+				drawCorner(x+w,y,x+w,y+.5*h,r);
+				drawCorner(x+w,y+h,x+.5*w,y+h,r);
+				drawCorner(x,y+h,x,y+.5*h,r);
+				drawCorner(x,y,x+.5*w,y,r);
+				ctx.closePath();
+				ctx.fill();
+			}
+		}
+		function fillCorner(xs,ys,xc,yc,xd,yd) {
 			ctx.beginPath();
 			ctx.moveTo(xs,ys);
 			drawCorner(xc,yc,xd,yd,r);
@@ -167,55 +160,56 @@ QRCanvas.prototype={
 			ctx.closePath();
 			ctx.fill();
 		}
-		function drawLiquid(r) {
-			function fillTile(i,j) {
-				var cell=t.getTile(i,j),w=cell.width,h=cell.height,x=cell.x,y=cell.y,
-						colorDark=t.getColor(t.colorDark,i,j),colorLight=t.getColor(t.colorLight,i,j),
-						corners=[0,0,0,0];	// NW,NE,SE,SW
-				if(t.isDark(i-1,j)) {corners[0]++;corners[1]++;}
-				if(t.isDark(i+1,j)) {corners[2]++;corners[3]++;}
-				if(t.isDark(i,j-1)) {corners[0]++;corners[3]++;}
-				if(t.isDark(i,j+1)) {corners[1]++;corners[2]++;}
-				// clear cell
-				ctx.fillStyle=colorLight;
-				ctx.fillRect(x,y,w,h);
-				// draw cell
-				ctx.fillStyle=colorDark;
-				if(t.isDark(i,j)) {
-					if(t.isDark(i-1,j-1)) corners[0]++;
-					if(t.isDark(i-1,j+1)) corners[1]++;
-					if(t.isDark(i+1,j+1)) corners[2]++;
-					if(t.isDark(i+1,j-1)) corners[3]++;
-					ctx.beginPath();
-					ctx.moveTo(x+.5*w,y);
-					drawCorner(x+w,y,x+w,y+.5*h,corners[1]?0:r);
-					drawCorner(x+w,y+h,x+.5*w,y+h,corners[2]?0:r);
-					drawCorner(x,y+h,x,y+.5*h,corners[3]?0:r);
-					drawCorner(x,y,x+.5*w,y,corners[0]?0:r);
-					ctx.closePath();
-					ctx.fill();
-				} else {
-					if(corners[0]==2) fillCorner(x,y+.5*h,x,y,x+.5*w,y,r);
-					if(corners[1]==2) fillCorner(x+.5*w,y,x+w,y,x+w,y+.5*h,r);
-					if(corners[2]==2) fillCorner(x+w,y+.5*h,x+w,y+h,x+.5*w,y+h,r);
-					if(corners[3]==2) fillCorner(x+.5*w,y+h,x,y+h,x,y+.5*h,r);
-				}
+		function drawLiquid() {
+			var corners=[0,0,0,0];	// NW,NE,SE,SW
+			if(t.isDark(i-1,j)) {corners[0]++;corners[1]++;}
+			if(t.isDark(i+1,j)) {corners[2]++;corners[3]++;}
+			if(t.isDark(i,j-1)) {corners[0]++;corners[3]++;}
+			if(t.isDark(i,j+1)) {corners[1]++;corners[2]++;}
+			fillCell(colorLight);
+			// draw cell
+			ctx.fillStyle=colorDark;
+			if(t.isDark(i,j)) {
+				if(t.isDark(i-1,j-1)) corners[0]++;
+				if(t.isDark(i-1,j+1)) corners[1]++;
+				if(t.isDark(i+1,j+1)) corners[2]++;
+				if(t.isDark(i+1,j-1)) corners[3]++;
+				ctx.beginPath();
+				ctx.moveTo(x+.5*w,y);
+				drawCorner(x+w,y,x+w,y+.5*h,corners[1]?0:r);
+				drawCorner(x+w,y+h,x+.5*w,y+h,corners[2]?0:r);
+				drawCorner(x,y+h,x,y+.5*h,corners[3]?0:r);
+				drawCorner(x,y,x+.5*w,y,corners[0]?0:r);
+				ctx.closePath();
+				ctx.fill();
+			} else {
+				if(corners[0]==2) fillCorner(x,y+.5*h,x,y,x+.5*w,y);
+				if(corners[1]==2) fillCorner(x+.5*w,y,x+w,y,x+w,y+.5*h);
+				if(corners[2]==2) fillCorner(x+w,y+.5*h,x+w,y+h,x+.5*w,y+h);
+				if(corners[3]==2) fillCorner(x+.5*w,y+h,x,y+h,x,y+.5*h);
 			}
-			var i,j;
-			for(i=0;i<t.count;i++)
-				for(j=0;j<t.count;j++) fillTile(i,j);
 		}
-		var t=this,ctx=t.context,
-				r=t.effect.value*t.cellSize;
+		var t=this,ctx=t.context,r=t.effect.value*t.cellSize,
+				i,j,func,x,y,w,h,colorDark,colorLight;
 		// draw qrcode according to this.effect
-		switch(t.effect.key) {
+		if(r) switch(t.effect.key) {
 			case 'liquid':
-				drawLiquid(r);break;
+				func=drawLiquid;break;
 			case 'round':
-				drawRound(r);break;
+				func=drawRound;break;
 			default:
-				drawRound(0);
-		}
+				func=drawSquare;
+		} else func=drawSquare;
+		// draw cells
+		for(i=0;i<t.count;i++)
+			for(j=0;j<t.count;j++) {
+				cell=t.getCell(i,j);
+				x=cell.x;y=cell.y;
+				w=cell.width;h=cell.height;
+				colorDark=t.getColor(t.colorDark,i,j);
+				colorLight=t.getColor(t.colorLight,i,j);
+				func();
+			}
 		// finally draw image
 		t.drawImage();
 	},

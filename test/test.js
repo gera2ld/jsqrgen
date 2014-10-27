@@ -66,7 +66,7 @@ function utf8Encode(string) {
 			},
 			data:utf8Encode($('#qrtext').value),
 		};
-		if(s>0)
+		if(s>=0)
 			options.effect={key:'round',value:s};
 		else
 			options.effect={key:'liquid',value:-s};
