@@ -10,10 +10,13 @@
 		<div>
 			<h1>QRCode Generator</h1>
 			<div>
-				Image: <img id=qrimg src=monkey_24.png>
-				<label><input id=qrclearedges type=checkbox checked>Clear edges</label>
+				<label><input id=cbimg type=checkbox>No image</label>
+				<div>
+					Image: <img id=qrimg src=monkey_24.png><br>
+					<label><input id=qrclearedges type=checkbox checked>Clear edges</label>
+					<input id=fimg type=file>
+				</div>
 			</div>
-			<div><input id=fimg type=file></div>
 			<div>Text: <textarea id=qrtext>http://geraldl.net</textarea></div>
 			<div>Size: <input id=cellSize type=range min=2 max=10 value=6></div>
 			<table>
@@ -36,7 +39,7 @@
 			<button id=qrgen>Generate</button> <a target=_blank href=https://github.com/gera2ld/jsqrgen>Visit Github</a>
 			<div>Hint: Click on the QRCode and you will get the image when run on a server.</div>
 		</div>
-		<div id=qrcode></div>
+		<div id=qrcanvas></div>
 		<script src=test.js></script>
 	</body>
 </html>

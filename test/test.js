@@ -44,7 +44,10 @@ function utf8Encode(string) {
 		else if(i<7&&j<7||i<7&&lj<7||li<7&&j<7) return $('#colorOut').value;
 		else return $('#colorFore').value;
 	}
-	var q=$('#qrcode'),t=$('#cellEffect');
+	var c=$('#cbimg'),q=$('#qrcanvas'),t=$('#cellEffect');
+	c.onchange=function(e){
+		this.parentNode.nextElementSibling.style.display=this.checked?'none':'';
+	};
 	q.onclick=function(e){
 		if(e.target.tagName=='CANVAS') {
 			var a=document.createElement('a');
@@ -60,11 +63,11 @@ function utf8Encode(string) {
 			cellSize:$('#cellSize').value,
 			colorDark:getColor,
 			colorLight:$('#colorBack').value,
-			image:{
-				dom:$('#qrimg'),
-				clearEdges:$('#qrclearedges').checked,
-			},
 			data:utf8Encode($('#qrtext').value),
+		};
+		if(!c.checked) options.image={
+			dom:$('#qrimg'),
+			clearEdges:$('#qrclearedges').checked,
 		};
 		if(s>=0)
 			options.effect={key:'round',value:s};
