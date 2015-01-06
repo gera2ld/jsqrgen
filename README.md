@@ -24,7 +24,7 @@ qrc.appendTo(document.getElementById('qrcode'));
 
 Check `test` folder for more advanced examples.
 
-[中文说明](http://geraldl.net/js/qrgen) [测试页面](http://geraldl.net/js/qrgen-test)
+[中文说明](http://geraldl.net/it/qrgen) [测试页面](http://geraldl.net/js/qrgen-test)
 
 Document
 ---
