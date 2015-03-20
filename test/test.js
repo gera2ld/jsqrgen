@@ -73,7 +73,7 @@ function utf8Encode(string) {
 			options.effect={key:'round',value:s};
 		else
 			options.effect={key:'liquid',value:-s};
-		new QRCanvas(options).appendTo(q);
+		QRCanvas(options).appendTo(q);
 	};
 	$('#cellEffectStops').onclick=function(e){
 		var d=e.target.getAttribute('data');
