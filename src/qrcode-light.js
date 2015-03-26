@@ -1,21 +1,21 @@
-//---------------------------------------------------------------------
-//
-// QR Code Generator for JavaScript
-//
-// Copyright (c) 2009 Kazuhiko Arase
-//
-// URL: http://www.d-project.com/
-//
-// Licensed under the MIT license:
-//	http://www.opensource.org/licenses/mit-license.php
-//
-// The word 'QR Code' is registered trademark of
-// DENSO WAVE INCORPORATED
-//	http://www.denso-wave.com/qrcode/faqpatent-e.html
-//
-// Modified by: Gerald <gera2ld@163.com>
-//	Removed unneeded code
-//---------------------------------------------------------------------
+/*********************************************************************
+ * QR Code Generator for JavaScript
+ *
+ * Copyright (c) 2009 Kazuhiko Arase
+ *
+ * URL: http://www.d-project.com/
+ *
+ * Licensed under the MIT license:
+ *	http://www.opensource.org/licenses/mit-license.php
+ *
+ * The word 'QR Code' is registered trademark of
+ * DENSO WAVE INCORPORATED
+ *	http://www.denso-wave.com/qrcode/faqpatent-e.html
+ *
+ * Modified by: Gerald <gera2ld@163.com>
+ *	* Removed unneeded code
+ *	* Added UTF-8 encoding
+ *********************************************************************/
 
 var qrcode = function() {
 
@@ -338,7 +338,7 @@ var qrcode = function() {
 		var createData = function(typeNumber, errorCorrectLevel, dataList) {
 			var test=typeNumber<1;
 			if(test) typeNumber=1;
-			
+
 			while(1) {
 				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
 
@@ -424,11 +424,28 @@ var qrcode = function() {
 	// qrcode.stringToBytes
 	//---------------------------------------------------------------------
 
-	qrcode.stringToBytes = function(s) {
+	/*qrcode.stringToBytes = function(s) {
 		var bytes = new Array();
 		for (var i = 0; i < s.length; i += 1) {
 			var c = s.charCodeAt(i);
 			bytes.push(c & 0xff);
+		}
+		return bytes;
+	};*/
+ 	qrcode.stringToBytes=function(s) {
+		var bytes=new Array(),i,c;
+		s=s.replace(/\r\n/g,'\n');
+		for(i=0;i<s.length;i++) {
+			c=s.charCodeAt(i);
+			if(c<128) bytes.push(c);
+			else if(c<2048) {
+				bytes.push((c>>6)|192);
+				bytes.push((c&63)|128);
+			} else {
+				bytes.push((c>>12)|224);
+				bytes.push(((c>>6)&63)|128);
+				bytes.push((c&63)|128);
+			}
 		}
 		return bytes;
 	};
