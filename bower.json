@@ -1,0 +1,22 @@
+{
+  "name": "jsqrgen",
+  "version": "1.0.0",
+  "description": "Generate characteristic qrcodes with a canvas.",
+  "authors": [
+    "Gerald <gera2ld@163.com>"
+  ],
+  "main": "dist/qrgen.min.js",
+  "keywords": [
+    "qrcode",
+    "qrgen",
+    "jsqrgen"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "src"
+  ]
+}
