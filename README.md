@@ -33,7 +33,7 @@ Document
   This is a function to build a QRCanvas object with a QRCode and a canvas built inside.
   * *options* is an object with or without the attributes below (all attributes are optional):
     * *data*
-      The **raw** data to be encoded in the QRCode, text should be encoded before calling.
+      The **raw** data to be encoded in the QRCode, UTF-8 encoded text is also accepted.
     * *cellSize* \*
       The pixel width or height of a cell.
     * *size* \*

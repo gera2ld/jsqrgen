@@ -1,5 +1,6 @@
-/*
- * Author: Gerald <gera2ld@163.com>
+/**
+ * @author Gerald <gera2ld@163.com>
+ * @license MIT
  */
 function CanvasRender(options) {
 	function getCell(row,col) {

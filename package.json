@@ -4,6 +4,7 @@
   "title": "JsQRGen",
   "description": "Generate characteristic qrcodes with a canvas.",
   "author": "Gerald <gera2ld@163.com>",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git@github.com:gera2ld/jsqrgen.git"
@@ -14,6 +15,7 @@
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-concat": "^2.5.2",
+    "gulp-header": "^1.2.2",
     "gulp-rename": "^1.2.0",
     "gulp-uglify": "^1.1.0",
     "gulp-wrap": "^0.10.1"
