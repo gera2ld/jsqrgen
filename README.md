@@ -1,6 +1,8 @@
 JS QRGen
 ===
 
+![Bower](https://img.shields.io/bower/v/jsqrgen.svg)
+
 This is a QRCode generator written in pure javascript, without any dependencies. (jQuery is not needed, either.)
 
 Based on [Kazuhiko Arase's QRCode](http://www.d-project.com/).
@@ -9,6 +11,15 @@ The only requirement is that the browser works with a `canvas`, which is support
 
 Usage
 ---
+Install with bower:
+
+``` sh
+$ npm install bower
+$ bower install jsqrgen
+```
+
+You may also download `dist/qrgen.min.js` manually.
+
 Here is a simple example:
 
 ``` html
@@ -30,37 +41,67 @@ Document
 ---
 
 * *function* QRCanvas(*options*)
+
   This is a function to build a QRCanvas object with a QRCode and a canvas built inside.
+
   * *options* is an object with or without the attributes below (all attributes are optional):
+
     * *data*
+
       The **raw** data to be encoded in the QRCode, UTF-8 encoded text is also accepted.
+
     * *cellSize* \*
+
       The pixel width or height of a cell.
+
     * *size* \*
+
       The pixel width or height of the entire image, ignored if *cellSize* is assigned.
+
     * *typeNumber*
+
       The type number of the QRCode, may be one of `1..10`. If less than `1`, the smallest valid type number will be found.
+
     * *correctLevel*
+
       The correct level of QRCode, should be one of `['L','M','Q','H']`, default as `M`.
       When *image* is assigned, *correctLevel* will be set to `H`.
+
     * *colorDark* \*\*
+
       The background color of a cell when it is dark, default as `black`.
+
     * *colorLight* \*\*
+
       The background color of a cell when it is not dark, default as `white`.
+
     * *image*
+
       An object with attributes listed below (all optional):
+
       * *dom*
+
         An `img` element with the image to be drawn in the middle of the canvas.
+
       * *clearEdges*
+
         A boolean to decide whether to clear the cells broken by the image, default as `true`.
+
       * *margin*
+
         The pixel gap between the image and the QRCode cells around it, default as `2`.
+
     * *effect*
+
       An object with a *key* attribute to choose an effect, and *value* attribute as a parameter.
       *key* can be `null` or one of the items below:
+
       * `round`
+
         *value* is a ratio between 0 and 0.5, making cells round with a border-radius of *value* * `cellSize`.
+
       * `liquid`
+
         *value* is a ratio between 0 and 0.5.
 
   \* Since *width* and *height* of a QRCode are always equal, we just need one of them, renaming to *size*.
@@ -70,7 +111,9 @@ Document
      in different positions to make a characteristic QRCode.
 
   * Returns an object with methods below:
+
     * *function* appendTo(*dom*)
+
       Append the `canvas` to *dom*, works the same as `dom.appendChild(the_canvas)`.
 
 Known Issues
