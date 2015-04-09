@@ -14,7 +14,6 @@ Usage
 Install with bower:
 
 ``` sh
-$ npm install bower
 $ bower install jsqrgen
 ```
 
@@ -23,17 +22,17 @@ You may also download `dist/qrgen.min.js` manually.
 Here is a simple example:
 
 ``` html
-<script type=text/javascript src=qrgen.min.js></script>
-<div id=qrcode></div>
+<script src="qrgen.min.js"></script>
+<div id="qrcode"></div>
 <script>
 var qrc=QRCanvas({
-	data:location.href
+        data:location.href
 });
 qrc.appendTo(document.getElementById('qrcode'));
 </script>
 ```
 
-Check `test` folder for more advanced examples.
+Check [examples](examples) folder for more advanced examples.
 
 [中文说明](http://geraldl.net/it/qrgen) [测试页面](http://geraldl.net/js/qrgen-test)
 
@@ -44,54 +43,80 @@ Document
 
   This is a function to build a QRCanvas object with a QRCode and a canvas built inside.
 
-  * *options* is an object with or without the attributes below (all attributes are optional):
+  * `options` is an object with or without the attributes below (all attributes are optional):
 
-    * *data*
+    * `data`
 
       The **raw** data to be encoded in the QRCode, UTF-8 encoded text is also accepted.
 
-    * *cellSize* \*
+    * `cellSize`
 
       The pixel width or height of a cell.
 
-    * *size* \*
+    * `size`
 
       The pixel width or height of the entire image, ignored if *cellSize* is assigned.
 
-    * *typeNumber*
+    * `typeNumber`
 
       The type number of the QRCode, may be one of `1..10`. If less than `1`, the smallest valid type number will be found.
 
-    * *correctLevel*
+    * `correctLevel`
 
       The correct level of QRCode, should be one of `['L','M','Q','H']`, default as `M`.
-      When *image* is assigned, *correctLevel* will be set to `H`.
+      When `logo` is assigned, `correctLevel` will be set to `H`.
 
-    * *colorDark* \*\*
+    * `colorDark` \*
 
       The background color of a cell when it is dark, default as `black`.
 
-    * *colorLight* \*\*
+    * `colorLight` \*
 
       The background color of a cell when it is not dark, default as `white`.
 
-    * *image*
+    * `logo`
 
       An object with attributes listed below (all optional):
 
-      * *dom*
+      * If the logo is an Image, attributes below should be included:
 
-        An `img` element with the image to be drawn in the middle of the canvas.
+        * `image`
 
-      * *clearEdges*
+           An *Image* element with the image to be drawn in the middle of the canvas.
 
-        A boolean to decide whether to clear the cells broken by the image, default as `true`.
+      * If the logo is text, attributes below may be included:
 
-      * *margin*
+        * `text`
 
-        The pixel gap between the image and the QRCode cells around it, default as `2`.
+          The text to be drawn as logo.
 
-    * *effect*
+        * `color`
+
+          Logo text color, default as `black`.
+
+        * `fontStyle`
+
+          Logo text style, e.g. `italic bold`.
+
+        * `fontFace`
+
+          Logo text font face, default as `Cursive`.
+
+      * Below are the common attributes:
+
+        * `clearEdges`
+
+          A boolean to decide whether to clear the cells broken by the image, default as `true`.
+
+        * `margin`
+
+          The pixel gap between the image and the QRCode cells around it, default as `2`.
+
+        * `size`
+
+          A float stands for the ratio of logo size to the QRCode size, default as `.15`, which is recommended.
+
+    * `effect`
 
       An object with a *key* attribute to choose an effect, and *value* attribute as a parameter.
       *key* can be `null` or one of the items below:
@@ -104,17 +129,15 @@ Document
 
         *value* is a ratio between 0 and 0.5.
 
-  \* Since *width* and *height* of a QRCode are always equal, we just need one of them, renaming to *size*.
-
-  \*\* Both *colorDark* and *colorLight* can be a callable function, which will return a color,
+  \* Both `colorDark` and `colorLight` can be a callable function, which will return a color,
      with `size_of_qrcode, row_id, column_id` as the arguments, so different colors may be used
      in different positions to make a characteristic QRCode.
 
   * Returns an object with methods below:
 
-    * *function* appendTo(*dom*)
+    * *function* appendTo(*ele*)
 
-      Append the `canvas` to *dom*, works the same as `dom.appendChild(the_canvas)`.
+      Append the `canvas` to *ele*, works the same as `ele.appendChild(the_canvas)`.
 
 Known Issues
 ---

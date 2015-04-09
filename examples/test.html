@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+	<head>
+		<title>QRCode</title>
+		<script src="../src/qrcode-light.js"></script>
+		<script src="../src/qrgen-canvas.js"></script>
+		<!--
+		<script src="../dist/qrgen.min.js"></script>
+		-->
+		<link type="text/css" rel="stylesheet" href="test.css" />
+	</head>
+	<body>
+		<a href="https://github.com/gera2ld/jsqrgen"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+		<table>
+			<colgroup>
+				<col width=30%>
+				<col>
+			</colgroup>
+			<caption>QRCode Generator</caption>
+			<tr>
+				<td>Text:</td>
+				<td><textarea id="qrtext">http://geraldl.net</textarea></td>
+			</tr><tr>
+				<td>Size:</td>
+				<td><input id="cellSize" type=range min=2 max=10 value=6></td>
+			</tr><tr>
+				<td rowspan=2>Effect:</td>
+				<td><input id="cellEffect" type=range min=-50 max=50 step=5 value=0></td>
+			</tr><tr>
+				<td id="cellEffectStops">
+					<div>
+						<div class="left"><a href=# data=l>Liquid</a></div>
+						<div class="right"><a href=# data=r>Round</a></div>
+						<div class="center"><a href=# data=s>Square</a></div>
+					</div>
+				</td>
+			</tr><tr>
+				<td rowspan=4>Colors:</td>
+				<td>Foreground <input id=colorFore type=color value=#4169e1></td>
+			</tr><tr>
+				<td>Background <input id=colorBack type=color value=#ffffff></td>
+			</tr><tr>
+				<td>Outside-border <input id=colorOut type=color value=#cd5c5c></td>
+			</tr><tr>
+				<td>Inside-border <input id=colorIn type=color value=#191970></td>
+			</tr><tr>
+				<td colspan=2>
+					<div>
+						<label><input id=cblogo type=checkbox>Add Logo</label>
+						<div id="logoOptions">
+							<span data="image">Image</span> <span data="text">Text</span>
+						</div>
+					</div>
+				</td>
+			</tr><tr>
+				<td colspan=2 id="logoTabs">
+					<div class="tab" data="image">
+						Image: <img id=logoImg src=iloveme.jpg><br>
+						<input id=fimg type=file>
+					</div>
+					<div class="tab" data="text">
+						Text: <input id=logoText><br>
+						Font: <input id=logoFont placeholder="CSS font string"><br>
+						Color: <input id=logoColor type=color>
+						<label><input id=logoBold type=checkbox>Bold</label>
+						<label><input id=logoItalic type=checkbox>Italic</label>
+					</div>
+					<div>Size: <input id="logoSize" type=range min=5 max=15 value=15></div>
+					<label><input id=qrclearedges type=checkbox checked>Clear edges</label>
+				</td>
+			</tr><tr>
+				<td><button id=qrgen>Generate</button></td>
+				<td><a target=_blank href=https://github.com/gera2ld/jsqrgen>Visit Github</a></td>
+			</tr>
+		</table>
+		<div id=qrcanvas></div>
+		<script src=test.js></script>
+	</body>
+</html>
