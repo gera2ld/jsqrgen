@@ -1,6 +1,6 @@
 {
   "name": "jsqrgen",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Generate characteristic qrcodes with a canvas.",
   "authors": [
     "Gerald <gera2ld@163.com>"
@@ -16,7 +16,10 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "test",
     "src"
-  ]
+  ],
+  "moduleType": [
+    "globals"
+  ],
+  "homepage": "https://github.com/gera2ld/jsqrgen"
 }
