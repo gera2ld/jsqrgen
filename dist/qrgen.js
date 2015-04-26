@@ -1235,9 +1235,12 @@ function CanvasRender(options) {
 				if(logo.fontStyle) font+=logo.fontStyle+' ';
 				font+=logo.height+'px '+logo.fontFace;
 				context.font=font;
-				context.textBaseline='hanging';
+				// draw text in the middle
+				context.textAlign='center';
+				context.textBaseline='middle';
 				context.fillStyle=logo.color;
-				context.fillText(logo.text,logo.x,logo.y);
+				var o=options.size/2;
+				context.fillText(logo.text,o,o);
 			}
 		}
 	}
