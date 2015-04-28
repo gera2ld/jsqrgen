@@ -38,106 +38,60 @@ Check [examples](examples) folder for more advanced examples.
 
 Document
 ---
-
-* *function* QRCanvas(*options*)
-
+* *function* QRCanvas(*options*)  
   This is a function to build a QRCanvas object with a QRCode and a canvas built inside.
-
   * `options` is an object with or without the attributes below (all attributes are optional):
-
-    * `data`
-
-      The **raw** data to be encoded in the QRCode, UTF-8 encoded text is also accepted.
-
-    * `cellSize`
-
+    * `data`  
+      The data to be encoded in the QRCode, text will be encoded in UTF-8.
+    * `cellSize` \*  
       The pixel width or height of a cell.
-
-    * `size`
-
+    * `size` \*  
       The pixel width or height of the entire image, ignored if *cellSize* is assigned.
-
-    * `typeNumber`
-
+    * `typeNumber`  
       The type number of the QRCode, may be one of `1..10`. If less than `1`, the smallest valid type number will be found.
-
-    * `correctLevel`
-
+    * `correctLevel`  
       The correct level of QRCode, should be one of `['L','M','Q','H']`, default as `M`.
       When `logo` is assigned, `correctLevel` will be set to `H`.
-
-    * `colorDark` \*
-
+    * `colorDark` \*\*  
       The background color of a cell when it is dark, default as `black`.
-
-    * `colorLight` \*
-
+    * `colorLight` \*\*  
       The background color of a cell when it is not dark, default as `white`.
-
-    * `logo`
-
+    * `logo`  
       An object with attributes listed below (all optional):
-
       * If the logo is an Image, attributes below should be included:
-
-        * `image`
-
+        * `image`  
            An *Image* element with the image to be drawn in the middle of the canvas.
-
       * If the logo is text, attributes below may be included:
-
-        * `text`
-
+        * `text`  
           The text to be drawn as logo.
-
-        * `color`
-
+        * `color`  
           Logo text color, default as `black`.
-
-        * `fontStyle`
-
+        * `fontStyle`  
           Logo text style, e.g. `italic bold`.
-
-        * `fontFace`
-
+        * `fontFace`  
           Logo text font face, default as `Cursive`.
-
       * Below are the common attributes:
-
-        * `clearEdges`
-
+        * `clearEdges`  
           A boolean to decide whether to clear the cells broken by the image, default as `true`.
-
-        * `margin`
-
+        * `margin`  
           The pixel gap between the image and the QRCode cells around it, default as `2`.
-
-        * `size`
-
+        * `size`  
           A float stands for the ratio of logo size to the QRCode size, default as `.15`, which is recommended.
-
-    * `effect`
-
+    * `effect`  
       An object with a *key* attribute to choose an effect, and *value* attribute as a parameter.
       *key* can be `null` or one of the items below:
-
-      * `round`
-
+      * `round`  
         *value* is a ratio between 0 and 0.5, making cells round with a border-radius of *value* * `cellSize`.
-
-      * `liquid`
-
+      * `liquid`  
         *value* is a ratio between 0 and 0.5.
 
-  \* Both `colorDark` and `colorLight` can be a callable function, which will return a color,
-     with `size_of_qrcode, row_id, column_id` as the arguments, so different colors may be used
-     in different positions to make a characteristic QRCode.
+The returned object has methods below:
+* *function* appendTo(*ele*)  
+  Append the `canvas` to *ele*, works the same as `ele.appendChild(the_canvas)`.
 
-  * Returns an object with methods below:
+\* It is highly recommended to use `cellSize` instead of `size` because when `size` is assigned and the calculated `cellSize` is not an integer, then the final image may be stretched and thus blurred.
 
-    * *function* appendTo(*ele*)
-
-      Append the `canvas` to *ele*, works the same as `ele.appendChild(the_canvas)`.
+\*\* Both `colorDark` and `colorLight` can be a callable function, with `size_of_qrcode, row_id, column_id` as the arguments. A CSS color is returned, so different colors may be used in different positions to make a characteristic QRCode.
 
 Known Issues
 ---
