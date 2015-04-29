@@ -45,7 +45,7 @@ Document
     The data to be encoded in the QRCode, text will be encoded in UTF-8.
 
   * `cellSize` \*  
-    The pixel width or height of a cell.
+    The pixel width or height of a cell. `2` as default if neither `cellSize` nor `size` is provided.
 
   * `size` \*  
     The pixel width or height of the entire image, ignored if *cellSize* is assigned.
