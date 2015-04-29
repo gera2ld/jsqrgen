@@ -5,7 +5,14 @@
  */
 'use strict';
 
-function CanvasRender(options) {
+function getCanvas(width, height) {
+	var canvas = document.createElement('canvas');
+	canvas.width = width;
+	canvas.height = height;
+	return canvas;
+};
+
+function renderByCanvas(options) {
 	var data = {};
 	function isDark(i, j) {
 		var logo = options.logo;
@@ -214,9 +221,8 @@ function CanvasRender(options) {
 		// ensure size and cellSize are integers
 		// so that there will not be gaps between cells
 		data.cellSize = Math.ceil(options.cellSize);
-		var canvas = document.createElement('canvas');
 		data.size = data.cellSize * options.count;
-		canvas.width = canvas.height = data.size;
+		var canvas = getCanvas(data.size, data.size);
 
 		data.context = canvas.getContext('2d');
 		prepareLogo();
@@ -227,17 +233,14 @@ function CanvasRender(options) {
 		// if the size is not expected,
 		// draw the QRCode to another canvas with the image stretched
 		if(data.size != options.size) {
-			var anotherCanvas = document.createElement('canvas');
-			anotherCanvas.width = anotherCanvas.height = options.size;
+			var anotherCanvas = getCanvas(options.size, options.size);
 			var context = anotherCanvas.getContext('2d');
 			context.drawImage(canvas, 0, 0, options.size, options.size);
 			canvas = anotherCanvas;
 			anotherCanvas = null;
 		}
 
-		return {
-			dom: canvas,
-		};
+		return canvas;
 	}
 
 	return draw();
@@ -302,15 +305,17 @@ function QRCanvas(options) {
 	var count=qr.getModuleCount();
 	// cellSize is used if assigned
 	// otherwise size is used
-	var cellSize = options.cellSize, size;
+	var cellSize = options.cellSize;
+	var size = options.size;
+	if(!cellSize && !size) cellSize = 2;
 	if(cellSize) size = cellSize * count;
-	else {
+	else if(size) {
 		size = options.size;
 		cellSize = size / count;
 	}
 
 	// render QRCode with a canvas
-	var result = CanvasRender({
+	var canvas = renderByCanvas({
 		cellSize: cellSize,
 		size: size,
 		count: count,
@@ -322,8 +327,9 @@ function QRCanvas(options) {
 	});
 
 	return {
+		dom: canvas,
 		appendTo: function(parent) {
-			parent.appendChild(result.dom);
+			parent.appendChild(this.dom);
 		},
 	};
 }
