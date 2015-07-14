@@ -51,7 +51,8 @@ Document
     The pixel width or height of the entire image, ignored if *cellSize* is assigned.
 
   * `typeNumber`  
-    The type number of the QRCode, may be one of `1..10`. If less than `1`, the smallest valid type number will be found.
+    The type number of the QRCode, may be one of `1..10`.
+    If it is too small to contain the data, the smallest valid type number will be used instead.
 
   * `correctLevel`  
     The correct level of QRCode, should be one of `['L','M','Q','H']`, default as `M`.

@@ -1,7 +1,7 @@
 *{box-sizing:border-box;}
 body{background:white;}
 table{border-collapse:collapse;width:300px;float:left;}
-td{vertical-align:top;}
+td{vertical-align:top;font-size:xx-small;}
 td>*{width:100%;}
 td .left{float:left;}
 td .center{text-align:center;}

@@ -74,6 +74,7 @@
 			colorDark:getColor,
 			colorLight:$('#colorBack').value,
 			data:$('#qrtext').value,
+      typeNumber:$('#typeNumber').value,
 		};
 		if(cbLogo.checked) {
 			options.logo={

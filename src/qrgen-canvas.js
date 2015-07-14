@@ -252,8 +252,9 @@ function extend(dict1, dict2){
 }
 
 function QRCanvas(options) {
-	// typeNumber belongs to 1..10, otherwise falls back to the smallest valid value
-	var typeNumber = options.typeNumber || 0;
+	// typeNumber belongs to 1..10
+  // will be increased to the smallest valid number if too small
+	var typeNumber = options.typeNumber || 1;
 
 	// correctLevel can be 'L', 'M', 'Q' or 'H'
 	var correctLevel = options.correctLevel || 'M';
