@@ -337,8 +337,8 @@ var qrcode = function() {
 		 * find the smallest valid typeNumber
 		 */
 		var createData = function(typeNumber, errorCorrectLevel, dataList) {
-			var test=typeNumber<1;
-			if(test) typeNumber=1;
+			//var test=typeNumber<1;
+			//if(test) typeNumber=1;
 
 			while(1) {
 				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
@@ -359,7 +359,7 @@ var qrcode = function() {
 				}
 
 				if (buffer.getLengthInBits() > totalDataCount * 8) {
-					if(test&&typeNumber<10) typeNumber++;
+					if(/*test&&*/typeNumber<10) typeNumber++;
 					else throw new Error('code length overflow. ('
 						+ buffer.getLengthInBits()
 						+ '>'
@@ -368,7 +368,7 @@ var qrcode = function() {
 				} else break;
 			}
 
-			if(test) _typeNumber=typeNumber;
+			/*if(test)*/ _typeNumber=typeNumber;
 
 			// end code
 			if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
@@ -1413,8 +1413,9 @@ function extend(dict1, dict2){
 }
 
 function QRCanvas(options) {
-	// typeNumber belongs to 1..10, otherwise falls back to the smallest valid value
-	var typeNumber = options.typeNumber || 0;
+	// typeNumber belongs to 1..10
+  // will be increased to the smallest valid number if too small
+	var typeNumber = options.typeNumber || 1;
 
 	// correctLevel can be 'L', 'M', 'Q' or 'H'
 	var correctLevel = options.correctLevel || 'M';

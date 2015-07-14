@@ -336,8 +336,8 @@ var qrcode = function() {
 		 * find the smallest valid typeNumber
 		 */
 		var createData = function(typeNumber, errorCorrectLevel, dataList) {
-			var test=typeNumber<1;
-			if(test) typeNumber=1;
+			//var test=typeNumber<1;
+			//if(test) typeNumber=1;
 
 			while(1) {
 				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
@@ -358,7 +358,7 @@ var qrcode = function() {
 				}
 
 				if (buffer.getLengthInBits() > totalDataCount * 8) {
-					if(test&&typeNumber<10) typeNumber++;
+					if(/*test&&*/typeNumber<10) typeNumber++;
 					else throw new Error('code length overflow. ('
 						+ buffer.getLengthInBits()
 						+ '>'
@@ -367,7 +367,7 @@ var qrcode = function() {
 				} else break;
 			}
 
-			if(test) _typeNumber=typeNumber;
+			/*if(test)*/ _typeNumber=typeNumber;
 
 			// end code
 			if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
