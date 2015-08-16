@@ -94,7 +94,7 @@
 			options.logo = {
 				clearEdges: Number($('#qrclearedges').value),
 				size: $('#logoSize').value / 100,
-        margin: 5,
+        margin: Number($('#logoMargin').value),
 			};
 			if (logoTab.type == 'image')
 				options.logo.image = logoImg;
