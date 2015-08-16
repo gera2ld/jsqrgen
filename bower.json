@@ -16,7 +16,8 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "src"
+    "src",
+    "backup"
   ],
   "moduleType": [
     "globals"
