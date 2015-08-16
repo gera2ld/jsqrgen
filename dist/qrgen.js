@@ -1647,13 +1647,16 @@ function QRCanvas(options) {
 		color: 'black',
 		fontFace: 'Cursive',
 		clearEdges: 0,
-		margin: 2,
+		margin: -1,
 		size: .15,
     irregular: false,
 	};
 	if(options.logo) extend(logo, options.logo);
 	// if a logo is to be added, correctLevel is set to H
-	if(logo.image || logo.text) correctLevel = 'H';
+	if(logo.image || logo.text) {
+    correctLevel = 'H';
+    if (logo.margin < 0) logo.margin = logo.image ? 0 : 2;
+  }
 
 	// Generate QRCode data with qrcode-light.js
 	var qr = qrcode(typeNumber, correctLevel);
