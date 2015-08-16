@@ -25,9 +25,9 @@
 			</tr><tr>
 				<td id="cellEffectStops">
 					<div>
-						<div class="left"><a href=# data=l>Liquid</a></div>
-						<div class="right"><a href=# data=r>Round</a></div>
-						<div class="center"><a href=# data=s>Square</a></div>
+						<div class="left"><a href=# data-key=l>Liquid</a></div>
+						<div class="right"><a href=# data-key=r>Round</a></div>
+						<div class="center"><a href=# data-key=s>Square</a></div>
 					</div>
 				</td>
 			</tr><tr>
@@ -47,17 +47,18 @@
 					<div>
 						<label><input id=cblogo type=checkbox>Add Logo</label>
 						<div id="logoOptions">
-							<span data="image">Image</span> <span data="text">Text</span>
+              <span data-type="image">Image</span>
+              <span data-type="text">Text</span>
 						</div>
 					</div>
 				</td>
 			</tr><tr>
-				<td colspan=2 id="logoTabs">
-					<div class="tab" data="image">
+				<td colspan=2 id="logoWrap">
+					<div class="tab" data-type="image">
 						Image: <img id=logoImg src=iloveme.jpg><br>
 						<input id=fimg type=file>
 					</div>
-					<div class="tab" data="text">
+					<div class="tab" data-type="text">
 						Text: <input id=logoText><br>
 						Font: <input id=logoFont placeholder="CSS font string"><br>
 						Color: <input id=logoColor type=color>

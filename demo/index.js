@@ -1,104 +1,118 @@
-(function($){
-	function switchLogoType(){
-		var type=logoType.getAttribute('data');
-		Array.prototype.forEach.call(logoTabs.querySelectorAll('.tab'),function(ele){
-			if(ele.getAttribute('data')==type) ele.classList.remove('hide');
-			else ele.classList.add('hide');
+(function ($) {
+  function forEach(arr, cb) {
+    for (var i = 0; i < arr.length; i ++)
+      cb.call(arr, arr[i], i);
+  }
+	function updateLogoTab() {
+		forEach(logoTabs, function (ele) {
+      ele.classList[ele.dataset.type === logoTab.type ? 'remove' : 'add']('hide');
 		});
 	}
-	function toggleLogo(){
-		if(cbLogo.checked) {
-			logoTabs.classList.remove('hide');
+	function toggleLogo() {
+		if (cbLogo.checked) {
+			logoWrap.classList.remove('hide');
 			logoOptions.classList.remove('hide');
-			switchLogoType();
+			updateLogoTab();
 		} else {
-			logoTabs.classList.add('hide');
+			logoWrap.classList.add('hide');
 			logoOptions.classList.add('hide');
 		}
 	}
-	function updateLogoType(ele){
-		if(logoType) logoType.classList.remove('active');
-		logoType=ele;
-		logoType.classList.add('active');
-		switchLogoType();
+	function updateLogoType(ele) {
+		if (logoTab.head) logoTab.head.classList.remove('active');
+		logoTab.head = ele;
+    logoTab.type = ele.dataset.type;
+		ele.classList.add('active');
+		updateLogoTab();
 	}
 
-	var logoTabs=$('#logoTabs'),logoOptions=$('#logoOptions'),
-	cbLogo=$('#cblogo'),logoType=null,logoImg=$('#logoImg');
-	updateLogoType($('#logoOptions>*[data]'));
-	cbLogo.onchange=toggleLogo;
-	$('#cellEffectStops').onclick=function(e){
-		var d=e.target.getAttribute('data');
-		if(d) {
+	var logoWrap = $('#logoWrap');
+  var logoTabs = logoWrap.querySelectorAll('.tab');
+  var logoOptions = $('#logoOptions');
+	var cbLogo = $('#cblogo');
+  var logoImg = $('#logoImg');
+  var logoTab = {};
+  updateLogoType($('#logoOptions>[data-type]'));
+	cbLogo.onchange = toggleLogo;
+	$('#cellEffectStops').addEventListener('click', function (e) {
+		var d = e.target.dataset.key;
+		if (d) {
 			e.preventDefault();
-			switch(d) {
+			switch (d) {
 				case 's':
-					t.value=0;break;
+					t.value = 0;
+          break;
 				case 'l':
-					t.value=-50;break;
+					t.value = -50;
+          break;
 				case 'r':
-					t.value=50;break;
+					t.value = 50;
+          break;
 			}
 		}
-	};
-	logoOptions.addEventListener('click', function(e){
-		var data=e.target.getAttribute('data');
-		if(data) updateLogoType(e.target);
+	}, false);
+	logoOptions.addEventListener('click', function (e) {
+		var type = e.target.dataset.type;
+		if (type) updateLogoType(e.target);
 	}, false);
 	toggleLogo();
 
-	$('#fimg').onchange=function(e){
-		var f=e.target.files,r;
-		if(f&&f[0]) {
-			r=new FileReader();
-			r.onload=function(e){
-				logoImg.src=e.target.result;
-			};
-			r.readAsDataURL(f[0]);
-		}
-	};
-	function getColor(n,i,j) {
-		var li=n-i-1,lj=n-j-1;
-		if(i>1&&i<5&&j>1&&j<5
-			||i>1&&i<5&&lj>1&&lj<5
-			||li>1&&li<5&&j>1&&j<5) return $('#colorIn').value;
-		else if(i<7&&j<7||i<7&&lj<7||li<7&&j<7) return $('#colorOut').value;
-		else return $('#colorFore').value;
+	$('#fimg').addEventListener('change', function (e) {
+    var reader = new FileReader;
+    reader.onload = function () {
+      logoImg.src = this.result;
+    };
+    reader.readAsDataURL(e.target.files[0]);
+	}, false);
+
+	function getColor(n, i, j) {
+		var li = n - i - 1;
+    var lj = n - j - 1;
+		if (
+      i > 1 && i < 5 && j > 1 && j < 5
+			|| i > 1 && i < 5 && lj > 1 && lj < 5
+			|| li > 1 && li < 5 && j > 1 && j < 5
+    ) return $('#colorIn').value;
+		else if (i<7 && j<7 || i < 7 && lj<7 || li < 7 && j < 7)
+      return $('#colorOut').value;
+		else
+      return $('#colorFore').value;
 	}
-	var q=$('#qrcanvas'),t=$('#cellEffect');
-	$('#qrgen').onclick=function(){
-		var options,s=t.value/100;
-		q.innerHTML='';
-		options={
-			cellSize:$('#cellSize').value,
-			colorDark:getColor,
-			colorLight:$('#colorBack').value,
-			data:$('#qrtext').value,
-      typeNumber:$('#typeNumber').value,
+	var q = $('#qrcanvas');
+  var t = $('#cellEffect');
+	$('#qrgen').onclick = function () {
+		var s = t.value / 100;
+		var options={
+			cellSize: Number($('#cellSize').value),
+			colorDark: getColor,
+			colorLight: $('#colorBack').value,
+			data: $('#qrtext').value,
+      typeNumber: Number($('#typeNumber').value),
 		};
-		if(cbLogo.checked) {
-			options.logo={
-				clearEdges:$('#qrclearedges').value,
-				size:$('#logoSize').value/100,
-        margin:5,
+		q.innerHTML='';
+		if (cbLogo.checked) {
+			options.logo = {
+				clearEdges: Number($('#qrclearedges').value),
+				size: $('#logoSize').value / 100,
+        margin: 5,
 			};
-			if(logoType.getAttribute('data')=='image')
-				options.logo.image=logoImg;
+			if (logoTab.type == 'image')
+				options.logo.image = logoImg;
 			else {
-				options.logo.text=$('#logoText').value;
-				var font=$('#logoFont').value;
-				if(font) options.logo.fontFace=font;
-				options.logo.color=$('#logoColor').value;
-				var style='';
-				if($('#logoItalic').checked) style+='italic ';
-				if($('#logoBold').checked) style+='bold ';
-				options.logo.fontStyle=style;
+				options.logo.text = $('#logoText').value;
+				var font = $('#logoFont').value;
+				if (font) options.logo.fontFace = font;
+				options.logo.color = $('#logoColor').value;
+				var style = '';
+				if ($('#logoItalic').checked) style += 'italic ';
+				if ($('#logoBold').checked) style += 'bold ';
+				options.logo.fontStyle = style;
 			}
 		}
-		if(s>=0)
-			options.effect={key:'round',value:s};
+		if (s >= 0)
+			options.effect = {key: 'round', value: s};
 		else
-			options.effect={key:'liquid',value:-s};
+			options.effect = {key: 'liquid', value: -s};
 		QRCanvas(options).appendTo(q);
 	};
 })(document.querySelector.bind(document));

@@ -10,6 +10,6 @@ td .right{float:right;}
 #logoOptions:not(.hide){display:inline;}
 #logoOptions>*{background:gray;padding:3px;cursor:pointer;}
 #logoOptions>*.active{background:green;color:white;}
-#logoTabs{border:1px solid gray;background:wheat;}
+#logoWrap{border:1px solid gray;background:wheat;}
 #logoImg{max-width:100px;max-height:100px;}
 #qrcanvas{float:left;margin:20px;}
