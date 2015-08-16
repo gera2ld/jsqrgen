@@ -78,8 +78,9 @@
 		};
 		if(cbLogo.checked) {
 			options.logo={
-				clearEdges:$('#qrclearedges').checked,
+				clearEdges:$('#qrclearedges').value,
 				size:$('#logoSize').value/100,
+        margin:5,
 			};
 			if(logoType.getAttribute('data')=='image')
 				options.logo.image=logoImg;

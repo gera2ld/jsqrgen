@@ -20,7 +20,7 @@ var banner=[
 ].join('\n');
 
 gulp.task('default',function(){
-	return gulp.src(['src/qrcode-light.js','src/qrgen-canvas.js'])
+	return gulp.src('src/*.js')
 		.pipe(concat('qrgen.js'))
 		.pipe(wrap('(function(){\n<%=contents%>\n}());'))
 		.pipe(gulp.dest('dist/'))
@@ -28,4 +28,8 @@ gulp.task('default',function(){
 		.pipe(header(banner,{pkg:pkg}))
 		.pipe(rename({suffix:'.min'}))
 		.pipe(gulp.dest('dist/'));
+});
+
+gulp.task('watch', function () {
+  return gulp.watch('src/*.js', ['default']);
 });

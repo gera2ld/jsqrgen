@@ -1,4 +1,205 @@
 (function(){
+/**
+ * @desc An edge detector based on canvas.
+ * @author Gerald <gera2ld@163.com>
+ * @license MIT
+ */
+'use strict';
+
+function Edger(canvas, options) {
+  var _this = this;
+  options = options || {};
+  _this.margin = options.margin || 0;
+  _this.isBackgroundColor = options.isBackgroundColor || _this._isBackgroundColor;
+  _this.prepare(canvas);
+}
+
+Edger.prototype = {
+  /**
+   * @desc The default isBackgroundColor callback to decide
+   * whether a color is background by its Alpha value.
+   */
+  _isBackgroundColor: function (colorArr) {
+    return !colorArr[3]; // alpha is 0
+  },
+  /**
+   * @desc The callback to tell whether a pixel is outside the edges.
+   */
+  isBackground: function(index) {
+    return this.data[index] === 1;
+  },
+  /**
+   * @desc Read image data from a canvas and find the edges of the image.
+   */
+  prepare: function (canvas) {
+    var _this = this;
+    var ctx = canvas.getContext('2d');
+    _this.width = canvas.width;
+    _this.height = canvas.height;
+    _this.total = _this.width * _this.height;
+    var imageData = ctx.getImageData(0, 0, _this.width, _this.height);
+    _this._rect = {
+      top: -1,
+      right: -1,
+      bottom: -1,
+      left: -1,
+    };
+
+    /**
+     * Whether the pixel should be background taking margin into account.
+     * 0 - not checked
+     * 1 - background
+     * 2 - edge of the image
+     */
+    _this.data = new Uint8Array(_this.total);
+    /**
+     * Whether the pixel itself is a background color.
+     * 0 - not checked
+     * 1 - background
+     * 2 - edge of the image
+     */
+    var isPixelBg = new Uint8Array(_this.total);
+
+    // BFS
+    var queue = [];
+    var slice = [].slice;
+    var checkPixel = function (index) {
+      var value = isPixelBg[index];
+      if (!value) {
+        var offset = index * 4;
+        var colorArr = slice.call(imageData.data, offset, offset + 4);
+        if (_this.isBackgroundColor(colorArr)) {
+          value = isPixelBg[index] = 1;
+        } else
+          value = isPixelBg[index] = 2;
+      }
+      return value === 1;
+    };
+    var checkCircular = function (index) {
+      if (_this.data[index]) return;
+      var x0 = index % _this.width;
+      var y0 = ~~ (index / _this.width);
+      var R = _this.margin + 1;
+      for (var x = Math.max(0, x0 - R + 1); x < x0 + R && x < _this.width; x ++)
+        for (var y = Math.max(0, y0 - R + 1); y < y0 + R && y < _this.height; y ++) {
+          var dx = x - x0;
+          var dy = y - y0;
+          if (dx * dx + dy * dy < R * R) {
+            if (!checkPixel(x + y * _this.width)) {
+              _this.data[index] = 2;
+              return;
+            }
+          }
+        }
+      _this.data[index] = 1;
+      queue.push(index);
+      var rect = _this._rect;
+      if (rect.top < 0 || rect.top > y0) rect.top = y0;
+      if (rect.right < 0 || rect.right < x0) rect.right = x0;
+      if (rect.bottom < 0 || rect.bottom < y0) rect.bottom = y0;
+      if (rect.left < 0 || rect.left > x0) rect.left = x0;
+    };
+    var checkThree = function (index, excludeSelf) {
+      if (index % _this.width) checkCircular(index - 1);
+      if (!excludeSelf) checkCircular(index);
+      if ((index + 1) % _this.width) checkCircular(index + 1);
+    };
+    for (var i = 0; i < _this.width; i ++) {
+      checkCircular(i);
+      checkCircular(_this.total - 1 - i);
+    }
+    for (var i = 0; i < _this.height; i ++) {
+      checkCircular(i * _this.width);
+      checkCircular((i + 1) * _this.width - 1);
+    }
+    var head = 0;
+    while (head < queue.length) {
+      var index = queue[head];
+      if (index > _this.width) checkThree(index - _this.width);
+      checkThree(index, true);
+      if (index + _this.width < _this.total) checkThree(index + _this.width);
+      head ++;
+    }
+    _this.totalBackground = head;
+  },
+  /**
+   * @desc Tranform a color number to a RGBA array.
+   */
+  getColorArr: function (color) {
+    return Array.isArray(color)
+      ? [
+        color[0] || 0,
+        color[1] || 0,
+        color[2] || 0,
+        color[3] || 0,
+      ] : [
+        color >>> 24,
+        color >>> 16 & 255,
+        color >>> 8 & 255,
+        color & 255,
+      ];
+  },
+  /**
+   * @desc To get a shadow with pure color
+   */
+  getShadow: function (color) {
+    var _this = this;
+    var canvas = getCanvas(_this.width, _this.height);
+    var ctx = canvas.getContext('2d');
+    var imageData = ctx.getImageData(0, 0, _this.width, _this.height);
+    color = _this.getColorArr(color);
+    for (var i = 0; i < _this.total; i ++)
+      if (!_this.isBackground(i)) {
+        var offset = i * 4;
+        imageData.data[offset] = color[0];
+        imageData.data[offset + 1] = color[1];
+        imageData.data[offset + 2] = color[2];
+        imageData.data[offset + 3] = color[3];
+      }
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+  },
+  /**
+   * @desc To clear the background so that the shadow can be filled with custom styles.
+   */
+  clearBackground: function (canvas) {
+    var _this = this;
+    if (canvas.width != _this.width || canvas.height != _this.height) return;
+    var ctx = canvas.getContext('2d');
+    var imageData = ctx.getImageData(0, 0, _this.width, _this.height);
+    for (var i = 0; i < _this.total; i ++)
+      if (_this.isBackground(i)) {
+        var offset = i * 4;
+        imageData.data[offset] = 0;
+        imageData.data[offset + 1] = 0;
+        imageData.data[offset + 2] = 0;
+        imageData.data[offset + 3] = 0;
+      }
+    ctx.putImageData(imageData, 0, 0);
+    return canvas;
+  },
+  /**
+   * @desc Get the real edges of the image excluding the background part.
+   */
+  getRect: function () {
+    var rect = this._rect;
+    return {
+      top: rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+      left: rect.left,
+      width: rect.right - rect.left + 1,
+      height: rect.bottom - rect.top + 1,
+    };
+  },
+};
+
+/**
+ * @description Exports to the global object
+ */
+
+window.QRCanvas = QRCanvas;
+
 /*********************************************************************
  * QR Code Generator for JavaScript
  *
@@ -1166,21 +1367,11 @@ var qrcode = function() {
  */
 'use strict';
 
-function getCanvas(width, height) {
-	var canvas = document.createElement('canvas');
-	canvas.width = width;
-	canvas.height = height;
-	return canvas;
-};
-
 function renderByCanvas(options) {
-	var data = {};
 	function isDark(i, j) {
 		var logo = options.logo;
-		return i >= 0 && i < options.count && j >= 0 && j < options.count
-			// when logo.rowN or logo.colN is not defined,
-			// any of the comparisons will be false
-			&& (!(i >= logo.row1 && i <= logo.row2 && j>=logo.col1 && j<=logo.col2))
+		return covered[i * options.count + j] < (options.logo.clearEdges ? 1 : 2)
+      && i >= 0 && i < options.count && j >= 0 && j < options.count
 			? options.isDark(i, j) : false;
 	}
 	function getColor(color, row, col) {
@@ -1213,28 +1404,14 @@ function renderByCanvas(options) {
 		var context = data.context;
 		if(logo.image || logo.text) {
 			if(!logo.clearEdges) {
-				context.fillStyle = getColor(options.colorLight, -1, -1);
-				context.fillRect(
-					logo.x - logo.margin,
-					logo.y - logo.margin,
-					logo.width + 2 * logo.margin,
-					logo.height + 2 * logo.margin
-				);
+        var canvas = getCanvas(logo.width + 2 * logo.margin, logo.height + 2 * logo.margin);
+        var ctx = canvas.getContext('2d');
+				ctx.fillStyle = getColor(options.colorLight, -1, -1);
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+        logo.edger.clearBackground(canvas);
+        context.drawImage(canvas, logo.x, logo.y);
 			}
-			if(logo.image)
-				context.drawImage(logo.image, logo.x, logo.y, logo.width, logo.height);
-			else {
-				var font = '';
-				if(logo.fontStyle) font += logo.fontStyle + ' ';
-				font += logo.height + 'px ' + logo.fontFace;
-				context.font = font;
-				// draw text in the middle
-				context.textAlign = 'center';
-				context.textBaseline = 'middle';
-				context.fillStyle = logo.color;
-				var o = data.size / 2;
-				context.fillText(logo.text, o, o);
-			}
+      context.drawImage(logo.canvas, logo.x, logo.y);
 		}
 	}
 	function drawSquare() {
@@ -1356,8 +1533,8 @@ function renderByCanvas(options) {
 
 		// calculate the number of cells to be broken or covered by the logo
 		k = width / height;
-		numberHeight = Math.floor(Math.sqrt(Math.min(width * height / data.size / data.size, logo.size) / k) * count);
-		numberWidth = Math.floor(k * numberHeight);
+		numberHeight = ~~(Math.sqrt(Math.min(width * height / data.size / data.size, logo.size) / k) * count);
+		numberWidth = ~~(k * numberHeight);
 		// (count - [numberWidth | numberHeight]) must be even if the logo is in the middle
 		if((count - numberWidth) % 2) numberWidth ++;
 		if((count - numberHeight) % 2) numberHeight ++;
@@ -1366,17 +1543,30 @@ function renderByCanvas(options) {
 		k = Math.min((numberHeight * data.cellSize - 2 * logo.margin) / height, (numberWidth * data.cellSize - 2 * logo.margin) / width, 1);
 		logo.width = ~~(k * width);
 		logo.height = ~~(k * height);
-		logo.x = (data.size - logo.width) / 2;
-		logo.y = (data.size - logo.height) / 2;
+		logo.x = (data.size - logo.width) / 2 - logo.margin;
+		logo.y = (data.size - logo.height) / 2 - logo.margin;
+
+    // draw logo to a canvas
+    logo.canvas = getCanvas(logo.width + logo.margin * 2, logo.height + logo.margin * 2);
+    var ctx = logo.canvas.getContext('2d');
+    if (logo.image)
+      ctx.drawImage(logo.image, logo.margin, logo.margin, logo.width, logo.height);
+    else {
+      var font = '';
+      if(logo.fontStyle) font += logo.fontStyle + ' ';
+      font += logo.height + 'px ' + logo.fontFace;
+      ctx.font = font;
+      // draw text in the middle
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = logo.color;
+      ctx.fillText(logo.text, logo.width / 2 + logo.margin, logo.height / 2 + logo.margin);
+    }
+    logo.edger = new Edger(logo.canvas, {margin: logo.margin});
 
 		// whether to clear cells broken by the logo (incomplete cells)
-		if(logo.clearEdges) {
-			logo.row1 = Math.floor((count - numberHeight) / 2);
-			logo.row2 = logo.row1 + numberHeight - 1;
-			logo.col1 = Math.floor((count - numberWidth) / 2);
-			logo.col2 = logo.col1 + numberWidth - 1;
-		} else
-			logo.row1 = logo.col1 = logo.row2 = logo.col2 = -1;
+		//if(logo.clearEdges)
+      // TODO mark broken cells by `covered`
 	}
 	function draw() {
 		// ensure size and cellSize are integers
@@ -1404,12 +1594,15 @@ function renderByCanvas(options) {
 		return canvas;
 	}
 
+	var data = {};
+  /**
+   * Whether the cell is covered.
+   * 0 - not covered.
+   * 1 - partially covered.
+   * 2 - completely covered.
+   */
+  var covered = new Uint8Array(options.count * options.count);
 	return draw();
-}
-
-// update dict1 with dict2
-function extend(dict1, dict2){
-	for(var i in dict2) dict1[i] = dict2[i];
 }
 
 function QRCanvas(options) {
@@ -1442,7 +1635,10 @@ function QRCanvas(options) {
 	 *   fontFace: string, default 'Cursive'
 
 	 *   // common
-	 *   clearEdges: bool, default true
+	 *   clearEdges: number, default 0
+   *       0 - not clear, just margin
+   *       1 - clear incomplete cells
+   *       2 - clear a larger rectangle area
 	 *   margin: number, default 2
 	 *   size: float, default .15 stands for 15% of the QRCode
 	 * }
@@ -1450,9 +1646,10 @@ function QRCanvas(options) {
 	var logo = {
 		color: 'black',
 		fontFace: 'Cursive',
-		clearEdges: true,
+		clearEdges: 0,
 		margin: 2,
 		size: .15,
+    irregular: false,
 	};
 	if(options.logo) extend(logo, options.logo);
 	// if a logo is to be added, correctLevel is set to H
@@ -1496,6 +1693,23 @@ function QRCanvas(options) {
 	};
 }
 
-window.QRCanvas = QRCanvas;
+/**
+ * Common functions for JSQRGen
+ * @author Gerald <gera2ld@163.com>
+ * @license MIT
+ */
+'use strict';
+
+function getCanvas(width, height) {
+	var canvas = document.createElement('canvas');
+	canvas.width = width;
+	canvas.height = height;
+	return canvas;
+};
+
+function extend(dict1, dict2) {
+	for(var key in dict2)
+    dict1[key] = dict2[key];
+}
 
 }());

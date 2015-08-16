@@ -5,21 +5,11 @@
  */
 'use strict';
 
-function getCanvas(width, height) {
-	var canvas = document.createElement('canvas');
-	canvas.width = width;
-	canvas.height = height;
-	return canvas;
-};
-
 function renderByCanvas(options) {
-	var data = {};
 	function isDark(i, j) {
 		var logo = options.logo;
-		return i >= 0 && i < options.count && j >= 0 && j < options.count
-			// when logo.rowN or logo.colN is not defined,
-			// any of the comparisons will be false
-			&& (!(i >= logo.row1 && i <= logo.row2 && j>=logo.col1 && j<=logo.col2))
+		return covered[i * options.count + j] < (options.logo.clearEdges ? 1 : 2)
+      && i >= 0 && i < options.count && j >= 0 && j < options.count
 			? options.isDark(i, j) : false;
 	}
 	function getColor(color, row, col) {
@@ -52,28 +42,14 @@ function renderByCanvas(options) {
 		var context = data.context;
 		if(logo.image || logo.text) {
 			if(!logo.clearEdges) {
-				context.fillStyle = getColor(options.colorLight, -1, -1);
-				context.fillRect(
-					logo.x - logo.margin,
-					logo.y - logo.margin,
-					logo.width + 2 * logo.margin,
-					logo.height + 2 * logo.margin
-				);
+        var canvas = getCanvas(logo.width + 2 * logo.margin, logo.height + 2 * logo.margin);
+        var ctx = canvas.getContext('2d');
+				ctx.fillStyle = getColor(options.colorLight, -1, -1);
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+        logo.edger.clearBackground(canvas);
+        context.drawImage(canvas, logo.x, logo.y);
 			}
-			if(logo.image)
-				context.drawImage(logo.image, logo.x, logo.y, logo.width, logo.height);
-			else {
-				var font = '';
-				if(logo.fontStyle) font += logo.fontStyle + ' ';
-				font += logo.height + 'px ' + logo.fontFace;
-				context.font = font;
-				// draw text in the middle
-				context.textAlign = 'center';
-				context.textBaseline = 'middle';
-				context.fillStyle = logo.color;
-				var o = data.size / 2;
-				context.fillText(logo.text, o, o);
-			}
+      context.drawImage(logo.canvas, logo.x, logo.y);
 		}
 	}
 	function drawSquare() {
@@ -195,8 +171,8 @@ function renderByCanvas(options) {
 
 		// calculate the number of cells to be broken or covered by the logo
 		k = width / height;
-		numberHeight = Math.floor(Math.sqrt(Math.min(width * height / data.size / data.size, logo.size) / k) * count);
-		numberWidth = Math.floor(k * numberHeight);
+		numberHeight = ~~(Math.sqrt(Math.min(width * height / data.size / data.size, logo.size) / k) * count);
+		numberWidth = ~~(k * numberHeight);
 		// (count - [numberWidth | numberHeight]) must be even if the logo is in the middle
 		if((count - numberWidth) % 2) numberWidth ++;
 		if((count - numberHeight) % 2) numberHeight ++;
@@ -205,17 +181,30 @@ function renderByCanvas(options) {
 		k = Math.min((numberHeight * data.cellSize - 2 * logo.margin) / height, (numberWidth * data.cellSize - 2 * logo.margin) / width, 1);
 		logo.width = ~~(k * width);
 		logo.height = ~~(k * height);
-		logo.x = (data.size - logo.width) / 2;
-		logo.y = (data.size - logo.height) / 2;
+		logo.x = (data.size - logo.width) / 2 - logo.margin;
+		logo.y = (data.size - logo.height) / 2 - logo.margin;
+
+    // draw logo to a canvas
+    logo.canvas = getCanvas(logo.width + logo.margin * 2, logo.height + logo.margin * 2);
+    var ctx = logo.canvas.getContext('2d');
+    if (logo.image)
+      ctx.drawImage(logo.image, logo.margin, logo.margin, logo.width, logo.height);
+    else {
+      var font = '';
+      if(logo.fontStyle) font += logo.fontStyle + ' ';
+      font += logo.height + 'px ' + logo.fontFace;
+      ctx.font = font;
+      // draw text in the middle
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = logo.color;
+      ctx.fillText(logo.text, logo.width / 2 + logo.margin, logo.height / 2 + logo.margin);
+    }
+    logo.edger = new Edger(logo.canvas, {margin: logo.margin});
 
 		// whether to clear cells broken by the logo (incomplete cells)
-		if(logo.clearEdges) {
-			logo.row1 = Math.floor((count - numberHeight) / 2);
-			logo.row2 = logo.row1 + numberHeight - 1;
-			logo.col1 = Math.floor((count - numberWidth) / 2);
-			logo.col2 = logo.col1 + numberWidth - 1;
-		} else
-			logo.row1 = logo.col1 = logo.row2 = logo.col2 = -1;
+		//if(logo.clearEdges)
+      // TODO mark broken cells by `covered`
 	}
 	function draw() {
 		// ensure size and cellSize are integers
@@ -243,12 +232,15 @@ function renderByCanvas(options) {
 		return canvas;
 	}
 
+	var data = {};
+  /**
+   * Whether the cell is covered.
+   * 0 - not covered.
+   * 1 - partially covered.
+   * 2 - completely covered.
+   */
+  var covered = new Uint8Array(options.count * options.count);
 	return draw();
-}
-
-// update dict1 with dict2
-function extend(dict1, dict2){
-	for(var i in dict2) dict1[i] = dict2[i];
 }
 
 function QRCanvas(options) {
@@ -281,7 +273,10 @@ function QRCanvas(options) {
 	 *   fontFace: string, default 'Cursive'
 
 	 *   // common
-	 *   clearEdges: bool, default true
+	 *   clearEdges: number, default 0
+   *       0 - not clear, just margin
+   *       1 - clear incomplete cells
+   *       2 - clear a larger rectangle area
 	 *   margin: number, default 2
 	 *   size: float, default .15 stands for 15% of the QRCode
 	 * }
@@ -289,9 +284,10 @@ function QRCanvas(options) {
 	var logo = {
 		color: 'black',
 		fontFace: 'Cursive',
-		clearEdges: true,
+		clearEdges: 0,
 		margin: 2,
 		size: .15,
+    irregular: false,
 	};
 	if(options.logo) extend(logo, options.logo);
 	// if a logo is to be added, correctLevel is set to H
@@ -334,5 +330,3 @@ function QRCanvas(options) {
 		},
 	};
 }
-
-window.QRCanvas = QRCanvas;
