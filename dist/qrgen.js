@@ -1,6 +1,6 @@
 /**
  * JSQRGen - Generate characteristic qrcodes with a canvas.
- * @version v1.1.4
+ * @version v1.2.0
  * @license MIT
  * @author Gerald <gera2ld@163.com>
  *
