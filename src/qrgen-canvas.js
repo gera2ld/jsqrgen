@@ -7,10 +7,9 @@
 
 function renderByCanvas(options) {
   function isDark(i, j) {
-    var logo = options.logo;
-    return covered[i * options.count + j] < (options.logo.clearEdges ? 1 : 2)
-      && i >= 0 && i < options.count && j >= 0 && j < options.count
-      ? options.isDark(i, j) : false;
+    return i >= 0 && i < options.count && j >= 0 && j < options.count
+      && (options.logo.clearEdges ? transparent[i * options.count + j] : true)
+      && options.isDark(i, j);
   }
   function getColor(color, row, col) {
     return typeof color == 'function' ? color(options.count, row, col) : color;
@@ -203,8 +202,12 @@ function renderByCanvas(options) {
     logo.edger = new Edger(logo.canvas, {margin: logo.margin});
 
     // whether to clear cells broken by the logo (incomplete cells)
-    //if(logo.clearEdges)
-      // TODO mark broken cells by `covered`
+    if(logo.clearEdges) {
+      transparent = new Uint8Array(options.count * options.count);
+      for (var i = 0; i < options.count; i ++)
+        for (var j = 0; j < options.count; j ++)
+          transparent[i * options.count + j] = logo.edger.isBackground(j * data.cellSize - logo.x, i * data.cellSize - logo.y, data.cellSize, data.cellSize);
+    }
   }
   function draw() {
     // ensure size and cellSize are integers
@@ -235,11 +238,10 @@ function renderByCanvas(options) {
   var data = {};
   /**
    * Whether the cell is covered.
-   * 0 - not covered.
-   * 1 - partially covered.
-   * 2 - completely covered.
+   * 0 - partially or completely covered.
+   * 1 - transparent.
    */
-  var covered = new Uint8Array(options.count * options.count);
+  var transparent;
   return draw();
 }
 

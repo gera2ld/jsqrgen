@@ -22,9 +22,29 @@ Edger.prototype = {
     return !colorArr[3]; // alpha is 0
   },
   /**
-   * @desc The callback to tell whether a pixel is outside the edges.
+   * @desc The callback to tell whether a pixel or an area is outside the edges.
    */
-  isBackground: function(index) {
+  isBackground: function() {
+    var index;
+    if (arguments.length == 1)
+      index = arguments[0];
+    else if (arguments.length == 2)
+      index = arguments[0] + arguments[1] * this.width;
+    else if (arguments.length == 4) {
+      var x0 = arguments[0];
+      var y0 = arguments[1];
+      var x1 = x0 + arguments[2];
+      var y1 = y0 + arguments[3];
+      if (x0 < 0) x0 = 0;
+      if (y0 < 0) y0 = 0;
+      if (x1 > this.width) x1 = this.width;
+      if (y1 > this.height) y1 = this.height;
+      for (var x = x0; x < x1; x ++)
+        for (var y = y0; y < y1; y ++)
+          if (!this.isBackground(x, y)) return false;
+      return true;
+    } else
+      throw Error('Invalid index');
     return this.data[index] === 1;
   },
   /**

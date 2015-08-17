@@ -1,11 +1,11 @@
-var gulp=require('gulp'),
-		wrap=require('gulp-wrap'),
-		rename=require('gulp-rename'),
-		concat=require('gulp-concat'),
-		uglify=require('gulp-uglify'),
-		header=require('gulp-header'),
-		pkg=require('./package.json');
-var banner=[
+var gulp = require('gulp');
+var wrap = require('gulp-wrap');
+var rename = require('gulp-rename');
+var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
+var header = require('gulp-header');
+var pkg = require('./package.json');
+var banner = [
 	'/**',
 	' * <%= pkg.title %> - <%= pkg.description %>',
 	' * @version v<%= pkg.version %>',
@@ -19,14 +19,15 @@ var banner=[
 	'',
 ].join('\n');
 
-gulp.task('default',function(){
+gulp.task('default', function () {
 	return gulp.src('src/*.js')
 		.pipe(concat('qrgen.js'))
 		.pipe(wrap('(function(){\n<%=contents%>\n}());'))
+		.pipe(header(banner, {pkg: pkg}))
 		.pipe(gulp.dest('dist/'))
 		.pipe(uglify())
-		.pipe(header(banner,{pkg:pkg}))
-		.pipe(rename({suffix:'.min'}))
+		.pipe(header(banner, {pkg: pkg}))
+		.pipe(rename({suffix: '.min'}))
 		.pipe(gulp.dest('dist/'));
 });
 
