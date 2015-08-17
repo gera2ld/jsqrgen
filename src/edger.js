@@ -9,6 +9,7 @@ function Edger(canvas, options) {
   var _this = this;
   options = options || {};
   _this.margin = options.margin || 0;
+  _this.nobg = !!options.nobg;
   _this.isBackgroundColor = options.isBackgroundColor || _this._isBackgroundColor;
   _this.prepare(canvas);
 }
@@ -25,11 +26,12 @@ Edger.prototype = {
    * @desc The callback to tell whether a pixel or an area is outside the edges.
    */
   isBackground: function() {
+    var _this = this;
     var index;
     if (arguments.length == 1)
       index = arguments[0];
     else if (arguments.length == 2)
-      index = arguments[0] + arguments[1] * this.width;
+      index = arguments[0] + arguments[1] * _this.width;
     else if (arguments.length == 4) {
       var x0 = arguments[0];
       var y0 = arguments[1];
@@ -37,15 +39,15 @@ Edger.prototype = {
       var y1 = y0 + arguments[3];
       if (x0 < 0) x0 = 0;
       if (y0 < 0) y0 = 0;
-      if (x1 > this.width) x1 = this.width;
-      if (y1 > this.height) y1 = this.height;
+      if (x1 > _this.width) x1 = _this.width;
+      if (y1 > _this.height) y1 = _this.height;
       for (var x = x0; x < x1; x ++)
         for (var y = y0; y < y1; y ++)
-          if (!this.isBackground(x, y)) return false;
+          if (!_this.isBackground(x, y)) return false;
       return true;
     } else
       throw Error('Invalid index');
-    return this.data[index] === 1;
+    return _this.nobg ? false : _this.data[index] === 1;
   },
   /**
    * @desc Read image data from a canvas and find the edges of the image.
@@ -56,13 +58,14 @@ Edger.prototype = {
     _this.width = canvas.width;
     _this.height = canvas.height;
     _this.total = _this.width * _this.height;
+    if (_this.nobg) return;
     var imageData = ctx.getImageData(0, 0, _this.width, _this.height);
-    _this._rect = {
+    /*_this._rect = {
       top: -1,
       right: -1,
       bottom: -1,
       left: -1,
-    };
+    };*/
 
     /**
      * Whether the pixel should be background taking margin into account.
@@ -112,11 +115,11 @@ Edger.prototype = {
         }
       _this.data[index] = 1;
       queue.push(index);
-      var rect = _this._rect;
+      /*var rect = _this._rect;
       if (rect.top < 0 || rect.top > y0) rect.top = y0;
       if (rect.right < 0 || rect.right < x0) rect.right = x0;
       if (rect.bottom < 0 || rect.bottom < y0) rect.bottom = y0;
-      if (rect.left < 0 || rect.left > x0) rect.left = x0;
+      if (rect.left < 0 || rect.left > x0) rect.left = x0;*/
     };
     var checkThree = function (index, excludeSelf) {
       if (index % _this.width) checkCircular(index - 1);
@@ -200,7 +203,7 @@ Edger.prototype = {
   /**
    * @desc Get the real edges of the image excluding the background part.
    */
-  getRect: function () {
+  /*getRect: function () {
     var rect = this._rect;
     return {
       top: rect.top,
@@ -210,5 +213,5 @@ Edger.prototype = {
       width: rect.right - rect.left + 1,
       height: rect.bottom - rect.top + 1,
     };
-  },
+  },*/
 };
