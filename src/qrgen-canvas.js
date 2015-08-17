@@ -199,7 +199,7 @@ function renderByCanvas(options) {
       ctx.fillStyle = logo.color;
       ctx.fillText(logo.text, logo.width / 2 + logo.margin, logo.height / 2 + logo.margin);
     }
-    logo.edger = new Edger(logo.canvas, {margin: logo.margin});
+    logo.edger = new Edger(logo.canvas, {margin: logo.margin, nobg: logo.clearEdges == 2});
 
     // whether to clear cells broken by the logo (incomplete cells)
     if(logo.clearEdges) {
