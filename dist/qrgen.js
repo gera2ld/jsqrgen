@@ -1404,45 +1404,50 @@ var qrcode = function() {
 'use strict';
 
 function renderByCanvas(options) {
+
   function isDark(i, j) {
     return i >= 0 && i < options.count && j >= 0 && j < options.count
       && (options.logo.clearEdges ? clear[i * options.count + j] : true)
       && options.qr.isDark(i, j);
   }
+
   function drawCorner(cornerX, cornerY, x, y, r) {
-    var context = data.context;
+    var context = common.context;
     if(r) context.arcTo(cornerX, cornerY, x, y, r);
     else {
       context.lineTo(cornerX, cornerY);
       context.lineTo(x, y);
     }
   }
+
   function fillCorner(startX, startY, cornerX, cornerY, destX, destY) {
-    var context = data.context;
+    var context = common.context;
     context.beginPath();
     context.moveTo(startX, startY);
-    drawCorner(cornerX, cornerY, destX, destY, data.effect);
+    drawCorner(cornerX, cornerY, destX, destY, common.effect);
     context.lineTo(cornerX, cornerY);
     context.lineTo(startX, startY);
     //context.closePath();
     context.fill();
   }
+
   function drawSquare() {
-    var cell = data.cell;
-    var context = data.context;
-    var cellSize = data.cellSize;
+    var cell = common.cell;
+    var context = common.context;
+    var cellSize = common.cellSize;
     if (isDark(cell.i, cell.j)) {
       context.fillStyle = colorDark;
       context.fillRect(cell.x, cell.y, cellSize, cellSize);
     }
   }
+
   function drawRound() {
-    var cell = data.cell;
+    var cell = common.cell;
     var x = cell.x;
     var y = cell.y;
-    var context = data.context;
-    var cellSize = data.cellSize;
-    var effect = data.effect;
+    var context = common.context;
+    var cellSize = common.cellSize;
+    var effect = common.effect;
     // draw cell if it should be dark
     if(isDark(cell.i, cell.j)) {
       context.fillStyle = colorDark;
@@ -1456,16 +1461,17 @@ function renderByCanvas(options) {
       context.fill();
     }
   }
+
   function drawLiquid() {
     var corners = [0, 0, 0, 0]; // NW, NE, SE, SW
-    var cell = data.cell;
+    var cell = common.cell;
     var i = cell.i;
     var j = cell.j;
     var x = cell.x;
     var y = cell.y;
-    var context = data.context;
-    var effect = data.effect;
-    var cellSize = data.cellSize;
+    var context = common.context;
+    var effect = common.effect;
+    var cellSize = common.cellSize;
     if(isDark(i-1, j)) {corners[0] ++; corners[1] ++;}
     if(isDark(i+1, j)) {corners[2] ++; corners[3] ++;}
     if(isDark(i, j-1)) {corners[0] ++; corners[3] ++;}
@@ -1492,14 +1498,15 @@ function renderByCanvas(options) {
       if(corners[3] == 2) fillCorner(x + .5 * cellSize, y + cellSize, x, y + cellSize, x, y + .5 * cellSize);
     }
   }
+
   function drawCells() {
     var effect = options.effect;
     var func = drawSquare, i, j;
-    // data.cellSize should be INTEGER
-    var cellSize = data.cellSize;
-    data.effect = effect.value * cellSize;
+    // common.cellSize should be INTEGER
+    var cellSize = common.cellSize;
+    common.effect = effect.value * cellSize;
     // draw qrcode according to effect
-    if(data.effect)
+    if(common.effect)
       switch (effect.key) {
         case 'liquid':
           func = drawLiquid;
@@ -1511,7 +1518,7 @@ function renderByCanvas(options) {
     // draw cells
     for(i = 0; i < options.count; i ++)
       for(j = 0; j < options.count; j ++) {
-        data.cell = {
+        common.cell = {
           i: i,
           j: j,
           x: j * cellSize,
@@ -1520,11 +1527,12 @@ function renderByCanvas(options) {
         func();
       }
   }
+
   function prepareLogo(){
     // limit the logo size
     var logo = options.logo;
     var count = options.count;
-    var context = data.context;
+    var context = common.context;
     var k, width, height, numberWidth, numberHeight;
 
     // if logo is an image
@@ -1548,18 +1556,18 @@ function renderByCanvas(options) {
 
     // calculate the number of cells to be broken or covered by the logo
     k = width / height;
-    numberHeight = ~~ (Math.sqrt(Math.min(width * height / data.size / data.size, logo.size) / k) * count);
+    numberHeight = ~~ (Math.sqrt(Math.min(width * height / common.size / common.size, logo.size) / k) * count);
     numberWidth = ~~ (k * numberHeight);
     // (count - [numberWidth | numberHeight]) must be even if the logo is in the middle
     if ((count - numberWidth) % 2) numberWidth ++;
     if ((count - numberHeight) % 2) numberHeight ++;
 
     // calculate the final width and height of the logo
-    k = Math.min((numberHeight * data.cellSize - 2 * logo.margin) / height, (numberWidth * data.cellSize - 2 * logo.margin) / width, 1);
+    k = Math.min((numberHeight * common.cellSize - 2 * logo.margin) / height, (numberWidth * common.cellSize - 2 * logo.margin) / width, 1);
     logo.width = ~~ (k * width);
     logo.height = ~~ (k * height);
-    logo.x = ((data.size - logo.width) >>> 1) - logo.margin;
-    logo.y = ((data.size - logo.height) >>> 1) - logo.margin;
+    logo.x = ((common.size - logo.width) >> 1) - logo.margin;
+    logo.y = ((common.size - logo.height) >> 1) - logo.margin;
 
     // draw logo to a canvas
     logo.canvas = getCanvas(logo.width + logo.margin * 2, logo.height + logo.margin * 2);
@@ -1575,7 +1583,7 @@ function renderByCanvas(options) {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = logo.color;
-      ctx.fillText(logo.text, logo.width >>> 1 + logo.margin, logo.height >>> 1 + logo.margin);
+      ctx.fillText(logo.text, logo.width >> 1 + logo.margin, logo.height >> 1 + logo.margin);
     }
     logo.edger = new Edger(logo.canvas, {margin: logo.margin, nobg: logo.clearEdges == 2});
 
@@ -1584,65 +1592,81 @@ function renderByCanvas(options) {
       clear = new Uint8Array(options.count * options.count);
       for (var i = 0; i < options.count; i ++)
         for (var j = 0; j < options.count; j ++)
-          clear[i * options.count + j] = logo.edger.isBackground(j * data.cellSize - logo.x, i * data.cellSize - logo.y, data.cellSize, data.cellSize);
+          clear[i * options.count + j] = logo.edger.isBackground(j * common.cellSize - logo.x, i * common.cellSize - logo.y, common.cellSize, common.cellSize);
     }
   }
+
   function clearLogo() {
     var logo = options.logo;
-    var context = data.context;
+    var context = common.context;
     if((logo.image || logo.text) && !logo.clearEdges) {
-      var canvas = getCanvas(logo.width + 2 * logo.margin, logo.height + 2 * logo.margin);
-      var ctx = canvas.getContext('2d');
+      var canvas_logo_x = getCanvas(logo.width + 2 * logo.margin, logo.height + 2 * logo.margin);
+      var ctx = canvas_logo_x.getContext('2d');
       ctx.fillStyle = colorLight;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      logo.edger.clearBackground(canvas);
-      context.drawImage(canvas, logo.x, logo.y);
+      ctx.fillRect(0, 0, canvas_logo_x.width, canvas_logo_x.height);
+      logo.edger.clearBackground(canvas_logo_x);
+      context.drawImage(canvas_logo_x, logo.x, logo.y);
     }
   }
+
+  /**
+   * @desc Transform color to remove alpha channel
+   */
+  function transformColor(fg, bg, alpha) {
+    return ~~ (fg * alpha / 255 + bg * (255 - alpha) / 255);
+  }
+
   function drawForeground() {
-    var size = data.size;
-    var canvas = getCanvas(size, size);
-    initCanvas(canvas, extend({}, data, {data: options.foreground}));
-    var ctx = canvas.getContext('2d');
+    var size = common.size;
+    var canvas_fg = getCanvas(size, size);
+    initCanvas(canvas_fg, extend({}, common, {data: options.foreground}));
+    var ctx = canvas_fg.getContext('2d');
     var fore = ctx.getImageData(0, 0, size, size);
-    var raw = data.context.getImageData(0, 0, size, size);
+    var raw = common.context.getImageData(0, 0, size, size);
     var total = size * size;
     for (var i = 0; i < total; i ++) {
       var offset = i * 4;
-      fore.data[offset + 3] = 255 - raw.data[offset];
+      var alpha = 255 - raw.data[offset];
+      if (alpha < 255) {
+        fore.data[offset] = transformColor(fore.data[offset], 255, alpha);
+        fore.data[offset + 1] = transformColor(fore.data[offset + 1], 255, alpha);
+        fore.data[offset + 2] = transformColor(fore.data[offset + 2], 255, alpha);
+        fore.data[offset + 3] = 255;
+      }
     }
     ctx.putImageData(fore, 0, 0);
-    return canvas;
+    return canvas_fg;
   }
+
   function draw() {
     // ensure size and cellSize are integers
     // so that there will not be gaps between cells
-    data.cellSize = Math.ceil(options.cellSize);
-    var size = data.size = data.cellSize * options.count;
-    var canvas = getCanvas(size, size);
-    var context = data.context = canvas.getContext('2d');
-    context.fillStyle = colorLight;
-    context.fillRect(0, 0, size, size);
+    common.cellSize = Math.ceil(options.cellSize);
+    var size = common.size = common.cellSize * options.count;
+    var canvas_data = getCanvas(size, size);
+    var ctx_data = common.context = canvas_data.getContext('2d');
+    ctx_data.fillStyle = colorLight;
+    ctx_data.fillRect(0, 0, size, size);
     var logo = options.logo;
     prepareLogo();
     drawCells();
     clearLogo();
+
     var fore = drawForeground();
-    canvas = getCanvas(size, size);
-    initCanvas(canvas, extend({}, data, {data: options.background}));
-    context = canvas.getContext('2d');
-    context.drawImage(fore, 0, 0);
-    if (logo.canvas) context.drawImage(logo.canvas, logo.x, logo.y);
-    data.context = null;
+    var canvas = getCanvas(size, size);
+    initCanvas(canvas, extend({}, common, {data: options.background}));
+    var ctx_bg = canvas.getContext('2d');
+    ctx_bg.drawImage(fore, 0, 0);
+    if (logo.canvas) ctx_bg.drawImage(logo.canvas, logo.x, logo.y);
+    common.context = null;
 
     // if the size is not expected,
     // draw the QRCode to another canvas with the image stretched
     if(size != options.size) {
       var anotherCanvas = getCanvas(options.size, options.size);
-      var context = anotherCanvas.getContext('2d');
-      context.drawImage(canvas, 0, 0, options.size, options.size);
+      var ctx_another = anotherCanvas.getContext('2d');
+      ctx_another.drawImage(canvas, 0, 0, options.size, options.size);
       canvas = anotherCanvas;
-      anotherCanvas = null;
     }
 
     return canvas;
@@ -1650,7 +1674,7 @@ function renderByCanvas(options) {
 
   var colorDark = 'black';
   var colorLight = 'white';
-  var data = {};
+  var common = {};
   /**
    * Whether the cell is covered.
    * 0 - partially or completely covered.
