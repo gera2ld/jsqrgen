@@ -65,27 +65,27 @@
     reader.readAsDataURL(e.target.files[0]);
   }, false);
 
-  function getColor(n, i, j) {
-    var li = n - i - 1;
-    var lj = n - j - 1;
-    if (
-      i > 1 && i < 5 && j > 1 && j < 5
-      || i > 1 && i < 5 && lj > 1 && lj < 5
-      || li > 1 && li < 5 && j > 1 && j < 5
-    ) return $('#colorIn').value;
-    else if (i<7 && j<7 || i < 7 && lj<7 || li < 7 && j < 7)
-      return $('#colorOut').value;
-    else
-      return $('#colorFore').value;
-  }
   var q = $('#qrcanvas');
   var t = $('#cellEffect');
   $('#qrgen').onclick = function () {
     var s = t.value / 100;
+    var colorIn = $('#colorIn').value;
+    var colorOut = $('#colorOut').value;
+    var colorFore = $('#colorFore').value;
     var options={
       cellSize: Number($('#cellSize').value),
-      colorDark: getColor,
-      colorLight: $('#colorBack').value,
+      foreground: [
+        // foreground color
+        {style: colorFore},
+        // outer squares of the positioner
+        {row: 0, rows: 7, col: 0, cols: 7, style: colorOut},
+        {row: -7, rows: 7, col: 0, cols: 7, style: colorOut},
+        {row: 0, rows: 7, col: -7, cols: 7, style: colorOut},
+        // inner squares of the positioner
+        {row: 2, rows: 3, col: 2, cols: 3, style: colorIn},
+        {row: -5, rows: 3, col: 2, cols: 3, style: colorIn},
+        {row: 2, rows: 3, col: -5, cols: 3, style: colorIn},
+      ],
       data: $('#qrtext').value,
       typeNumber: Number($('#typeNumber').value),
     };
@@ -113,6 +113,6 @@
       options.effect = {key: 'round', value: s};
     else
       options.effect = {key: 'liquid', value: -s};
-    QRCanvas(options).appendTo(q);
+    q.appendChild(qrgen.canvas(options));
   };
 })(document.querySelector.bind(document));

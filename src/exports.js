@@ -2,4 +2,6 @@
  * @description Exports to the global object
  */
 
-window.QRCanvas = QRCanvas;
+window.qrgen = {
+  canvas: QRCanvas,
+};
