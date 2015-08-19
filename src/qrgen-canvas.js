@@ -8,11 +8,8 @@
 function renderByCanvas(options) {
   function isDark(i, j) {
     return i >= 0 && i < options.count && j >= 0 && j < options.count
-      && (options.logo.clearEdges ? transparent[i * options.count + j] : true)
-      && options.isDark(i, j);
-  }
-  function getColor(color, row, col) {
-    return typeof color == 'function' ? color(options.count, row, col) : color;
+      && (options.logo.clearEdges ? clear[i * options.count + j] : true)
+      && options.qr.isDark(i, j);
   }
   function drawCorner(cornerX, cornerY, x, y, r) {
     var context = data.context;
@@ -21,10 +18,6 @@ function renderByCanvas(options) {
       context.lineTo(cornerX, cornerY);
       context.lineTo(x, y);
     }
-  }
-  function fillCell(color) {
-    data.context.fillStyle = color;
-    data.context.fillRect(data.cell.x, data.cell.y, data.cellSize, data.cellSize);
   }
   function fillCorner(startX, startY, cornerX, cornerY, destX, destY) {
     var context = data.context;
@@ -36,23 +29,14 @@ function renderByCanvas(options) {
     //context.closePath();
     context.fill();
   }
-  function drawLogo() {
-    var logo = options.logo;
-    var context = data.context;
-    if(logo.image || logo.text) {
-      if(!logo.clearEdges) {
-        var canvas = getCanvas(logo.width + 2 * logo.margin, logo.height + 2 * logo.margin);
-        var ctx = canvas.getContext('2d');
-        ctx.fillStyle = getColor(options.colorLight, -1, -1);
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        logo.edger.clearBackground(canvas);
-        context.drawImage(canvas, logo.x, logo.y);
-      }
-      context.drawImage(logo.canvas, logo.x, logo.y);
-    }
-  }
   function drawSquare() {
-    fillCell(isDark(data.cell.i, data.cell.j) ? data.cell.colorDark : data.cell.colorLight);
+    var cell = data.cell;
+    var context = data.context;
+    var cellSize = data.cellSize;
+    if (isDark(cell.i, cell.j)) {
+      context.fillStyle = colorDark;
+      context.fillRect(cell.x, cell.y, cellSize, cellSize);
+    }
   }
   function drawRound() {
     var cell = data.cell;
@@ -61,11 +45,9 @@ function renderByCanvas(options) {
     var context = data.context;
     var cellSize = data.cellSize;
     var effect = data.effect;
-    // fill arc with border-radius=effect
-    fillCell(cell.colorLight);
     // draw cell if it should be dark
     if(isDark(cell.i, cell.j)) {
-      context.fillStyle = cell.colorDark;
+      context.fillStyle = colorDark;
       context.beginPath();
       context.moveTo(x + .5 * cellSize, y);
       drawCorner(x + cellSize, y, x + cellSize, y + .5*cellSize, effect);
@@ -90,9 +72,8 @@ function renderByCanvas(options) {
     if(isDark(i+1, j)) {corners[2] ++; corners[3] ++;}
     if(isDark(i, j-1)) {corners[0] ++; corners[3] ++;}
     if(isDark(i, j+1)) {corners[1] ++; corners[2] ++;}
-    fillCell(cell.colorLight);
     // draw cell
-    context.fillStyle = cell.colorDark;
+    context.fillStyle = colorDark;
     if(isDark(i, j)) {
       if(isDark(i-1, j-1)) corners[0] ++;
       if(isDark(i-1, j+1)) corners[1] ++;
@@ -115,11 +96,13 @@ function renderByCanvas(options) {
   }
   function drawCells() {
     var effect = options.effect;
-    var func = null, i, j;
-    data.effect = effect.value * data.cellSize;
+    var func = drawSquare, i, j;
+    // data.cellSize should be INTEGER
+    var cellSize = data.cellSize;
+    data.effect = effect.value * cellSize;
     // draw qrcode according to effect
     if(data.effect)
-      switch(effect.key) {
+      switch (effect.key) {
         case 'liquid':
           func = drawLiquid;
           break;
@@ -127,17 +110,14 @@ function renderByCanvas(options) {
           func = drawRound;
           break;
       }
-    if(!func) func = drawSquare;
     // draw cells
     for(i = 0; i < options.count; i ++)
       for(j = 0; j < options.count; j ++) {
         data.cell = {
           i: i,
           j: j,
-          x: ~~ (j * data.cellSize),
-          y: ~~ (i * data.cellSize),
-          colorDark: getColor(options.colorDark, i, j),
-          colorLight: getColor(options.colorLight, i, j),
+          x: j * cellSize,
+          y: i * cellSize,
         };
         func();
       }
@@ -150,17 +130,17 @@ function renderByCanvas(options) {
     var k, width, height, numberWidth, numberHeight;
 
     // if logo is an image
-    if(logo.image) {
+    if (logo.image) {
       k = logo.image;
       width = k.naturalWidth || k.width;
       height = k.naturalHeight || k.height;
     }
     // if logo is text
-    else if(logo.text) {
+    else if (logo.text) {
       // get text width/height radio by assuming fontHeight=100px
       height = 100;
       k = '';
-      if(logo.fontStyle) k += logo.fontStyle + ' ';
+      if (logo.fontStyle) k += logo.fontStyle + ' ';
       k += height + 'px ' + logo.fontFace;
       context.font = k;
       width = context.measureText(logo.text).width;
@@ -170,18 +150,18 @@ function renderByCanvas(options) {
 
     // calculate the number of cells to be broken or covered by the logo
     k = width / height;
-    numberHeight = ~~(Math.sqrt(Math.min(width * height / data.size / data.size, logo.size) / k) * count);
-    numberWidth = ~~(k * numberHeight);
+    numberHeight = ~~ (Math.sqrt(Math.min(width * height / data.size / data.size, logo.size) / k) * count);
+    numberWidth = ~~ (k * numberHeight);
     // (count - [numberWidth | numberHeight]) must be even if the logo is in the middle
-    if((count - numberWidth) % 2) numberWidth ++;
-    if((count - numberHeight) % 2) numberHeight ++;
+    if ((count - numberWidth) % 2) numberWidth ++;
+    if ((count - numberHeight) % 2) numberHeight ++;
 
     // calculate the final width and height of the logo
     k = Math.min((numberHeight * data.cellSize - 2 * logo.margin) / height, (numberWidth * data.cellSize - 2 * logo.margin) / width, 1);
-    logo.width = ~~(k * width);
-    logo.height = ~~(k * height);
-    logo.x = (data.size - logo.width) / 2 - logo.margin;
-    logo.y = (data.size - logo.height) / 2 - logo.margin;
+    logo.width = ~~ (k * width);
+    logo.height = ~~ (k * height);
+    logo.x = ((data.size - logo.width) >> 1) - logo.margin;
+    logo.y = ((data.size - logo.height) >> 1) - logo.margin;
 
     // draw logo to a canvas
     logo.canvas = getCanvas(logo.width + logo.margin * 2, logo.height + logo.margin * 2);
@@ -197,34 +177,69 @@ function renderByCanvas(options) {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = logo.color;
-      ctx.fillText(logo.text, logo.width / 2 + logo.margin, logo.height / 2 + logo.margin);
+      ctx.fillText(logo.text, logo.width >> 1 + logo.margin, logo.height >> 1 + logo.margin);
     }
     logo.edger = new Edger(logo.canvas, {margin: logo.margin, nobg: logo.clearEdges == 2});
 
     // whether to clear cells broken by the logo (incomplete cells)
     if(logo.clearEdges) {
-      transparent = new Uint8Array(options.count * options.count);
+      clear = new Uint8Array(options.count * options.count);
       for (var i = 0; i < options.count; i ++)
         for (var j = 0; j < options.count; j ++)
-          transparent[i * options.count + j] = logo.edger.isBackground(j * data.cellSize - logo.x, i * data.cellSize - logo.y, data.cellSize, data.cellSize);
+          clear[i * options.count + j] = logo.edger.isBackground(j * data.cellSize - logo.x, i * data.cellSize - logo.y, data.cellSize, data.cellSize);
     }
+  }
+  function clearLogo() {
+    var logo = options.logo;
+    var context = data.context;
+    if((logo.image || logo.text) && !logo.clearEdges) {
+      var canvas = getCanvas(logo.width + 2 * logo.margin, logo.height + 2 * logo.margin);
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = colorLight;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      logo.edger.clearBackground(canvas);
+      context.drawImage(canvas, logo.x, logo.y);
+    }
+  }
+  function drawForeground() {
+    var size = data.size;
+    var canvas = getCanvas(size, size);
+    initCanvas(canvas, extend({}, data, {data: options.foreground}));
+    var ctx = canvas.getContext('2d');
+    var fore = ctx.getImageData(0, 0, size, size);
+    var raw = data.context.getImageData(0, 0, size, size);
+    var total = size * size;
+    for (var i = 0; i < total; i ++) {
+      var offset = i * 4;
+      fore.data[offset + 3] = 255 - raw.data[offset];
+    }
+    ctx.putImageData(fore, 0, 0);
+    return canvas;
   }
   function draw() {
     // ensure size and cellSize are integers
     // so that there will not be gaps between cells
     data.cellSize = Math.ceil(options.cellSize);
-    data.size = data.cellSize * options.count;
-    var canvas = getCanvas(data.size, data.size);
-
-    data.context = canvas.getContext('2d');
+    var size = data.size = data.cellSize * options.count;
+    var canvas = getCanvas(size, size);
+    var context = data.context = canvas.getContext('2d');
+    context.fillStyle = colorLight;
+    context.fillRect(0, 0, size, size);
+    var logo = options.logo;
     prepareLogo();
     drawCells();
-    drawLogo();
+    clearLogo();
+    var fore = drawForeground();
+    canvas = getCanvas(size, size);
+    initCanvas(canvas, extend({}, data, {data: options.background}));
+    context = canvas.getContext('2d');
+    context.drawImage(fore, 0, 0);
+    if (logo.canvas) context.drawImage(logo.canvas, logo.x, logo.y);
     data.context = null;
 
     // if the size is not expected,
     // draw the QRCode to another canvas with the image stretched
-    if(data.size != options.size) {
+    if(size != options.size) {
       var anotherCanvas = getCanvas(options.size, options.size);
       var context = anotherCanvas.getContext('2d');
       context.drawImage(canvas, 0, 0, options.size, options.size);
@@ -235,17 +250,19 @@ function renderByCanvas(options) {
     return canvas;
   }
 
+  var colorDark = 'black';
+  var colorLight = 'white';
   var data = {};
   /**
    * Whether the cell is covered.
    * 0 - partially or completely covered.
-   * 1 - transparent.
+   * 1 - clear.
    */
-  var transparent;
+  var clear;
   return draw();
 }
 
-function QRCanvas(options) {
+function getQRCode(options) {
   // typeNumber belongs to 1..10
   // will be increased to the smallest valid number if too small
   var typeNumber = options.typeNumber || 1;
@@ -253,14 +270,20 @@ function QRCanvas(options) {
   // correctLevel can be 'L', 'M', 'Q' or 'H'
   var correctLevel = options.correctLevel || 'M';
 
-  // colorDark and colorLight can be callable functions
-  var colorDark = options.colorDark || 'black';
-  var colorLight = options.colorLight || 'white';
+  // foreground and background may be an image or a style string
+  // or an array of objects with attributes below:
+  // * row | x: default 0
+  // * col | y: default 0
+  // * cols | width: default size
+  // * rows | height: default size
+  // * style: default 'black'
+  var foreground = options.foreground || 'black';
+  var background = options.background || null;
 
-  // data should be a string
+  // data MUST be a string
   var data = options.data || '';
 
-  // effect: {key: [round|liquid], value: 0}
+  // effect: {key: [round|liquid], value: 0-0.5}
   var effect = options.effect || {};
 
   /* an image or text can be used as a logo
@@ -289,11 +312,10 @@ function QRCanvas(options) {
     clearEdges: 0,
     margin: -1,
     size: .15,
-    irregular: false,
   };
-  if(options.logo) extend(logo, options.logo);
+  if (options.logo) extend(logo, options.logo);
   // if a logo is to be added, correctLevel is set to H
-  if(logo.image || logo.text) {
+  if (logo.image || logo.text) {
     correctLevel = 'H';
     if (logo.margin < 0) logo.margin = logo.image ? 0 : 2;
   }
@@ -304,34 +326,30 @@ function QRCanvas(options) {
   qr.make();
 
   // calculate QRCode and cell sizes
-  var count=qr.getModuleCount();
+  var count = qr.getModuleCount();
   // cellSize is used if assigned
   // otherwise size is used
   var cellSize = options.cellSize;
   var size = options.size;
-  if(!cellSize && !size) cellSize = 2;
-  if(cellSize) size = cellSize * count;
-  else if(size) {
+  if (!cellSize && !size) cellSize = 2;
+  if (cellSize) size = cellSize * count;
+  else if (size) {
     size = options.size;
     cellSize = size / count;
   }
 
-  // render QRCode with a canvas
-  var canvas = renderByCanvas({
+  return {
     cellSize: cellSize,
     size: size,
     count: count,
-    colorDark: colorDark,
-    colorLight: colorLight,
+    foreground: foreground,
+    background: background,
     logo: logo,
-    isDark: qr.isDark.bind(qr),
+    qr: qr,
     effect: effect,
-  });
-
-  return {
-    dom: canvas,
-    appendTo: function(parent) {
-      parent.appendChild(this.dom);
-    },
   };
+}
+
+function QRCanvas(options) {
+  return renderByCanvas(getQRCode(options));
 }

@@ -147,24 +147,25 @@ Edger.prototype = {
   /**
    * @desc Tranform a color number to a RGBA array.
    */
-  getColorArr: function (color) {
+  /*getColorArr: function (color) {
+    color = color || 255;
     return Array.isArray(color)
       ? [
         color[0] || 0,
         color[1] || 0,
         color[2] || 0,
-        color[3] || 0,
+        color[3] || 255,
       ] : [
         color >>> 24,
         color >>> 16 & 255,
         color >>> 8 & 255,
         color & 255,
       ];
-  },
+  },*/
   /**
    * @desc To get a shadow with pure color
    */
-  getShadow: function (color) {
+  /*getShadow: function (color) {
     var _this = this;
     var canvas = getCanvas(_this.width, _this.height);
     var ctx = canvas.getContext('2d');
@@ -180,7 +181,7 @@ Edger.prototype = {
       }
     ctx.putImageData(imageData, 0, 0);
     return canvas;
-  },
+  },*/
   /**
    * @desc To clear the background so that the shadow can be filled with custom styles.
    */
