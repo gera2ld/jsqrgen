@@ -39,6 +39,8 @@ Check `demo <demo>`__ folder for more advanced examples.
 
 Documentation
 -------------
+There will be a global variable :code:`qrgen` with methods below:
+
 - *function* qrgen.canvas( *options* )
 
   This is a function to build a QRCanvas object with a QRCode and a canvas built inside.
@@ -71,14 +73,14 @@ Documentation
        - String {'L', 'M', 'Q', 'H'}
        - 'M'
        - The correct level of QRCode. When `logo` is assigned, `correctLevel` will be set to `H`.
-     * - :code:`colorDark` [#color]_
+     * - :code:`foreground` [#color]_
        - String | Function
        - 'black'
-       - The background color of a cell when it is dark.
-     * - :code:`colorLight` [#color]_
+       - The foreground color or image of the QRCode.
+     * - :code:`background` [#color]_
        - String | Function
        - 'white'
-       - The background color of a cell when it is not dark.
+       - The background color or image of the QRCode.
      * - :code:`logo`
        - Object
        - {}
@@ -118,7 +120,50 @@ Documentation
 
 .. [#size] It is highly recommended to use :code:`cellSize` instead of :code:`size` because when :code:`size` is assigned and the calculated :code:`cellSize` is not an integer, the final image may be stretched and thus blurred.
 
-.. [#color] Both :code:`colorDark` and :code:`colorLight` can be a callable function, with :code:`size_of_qrcode, row_id, column_id` as the arguments. A CSS color is returned, so different colors may be used in different positions to make a characteristic QRCode.
+.. [#color] Both :code:`foreground` and :code:`background` can be an image (Image or Canvas), a string of CSS color, or an array of objects with attributes below:
+
+   .. list-table::
+
+      * - Attribute
+        - Type
+        - Default
+        - Description
+      * - :code:`col`
+        - Number
+        - Use :code:`x` instead
+        - Column index of the start position.
+      * - :code:`row`
+        - Number
+        - Use :code:`y` instead
+        - Row index of the start position.
+      * - :code:`cols`
+        - Number
+        - Use :code:`width` instead
+        - Number of columns involved in current style.
+      * - :code:`rows`
+        - Number
+        - Use :code:`height` instead
+        - Number of rows involved in current style.
+      * - :code:`x`
+        - Number
+        - 0
+        - X of start position.
+      * - :code:`y`
+        - Number
+        - 0
+        - Y of start position.
+      * - :code:`width`
+        - Number
+        - Full width
+        - Width of block involved in current style.
+      * - :code:`height`
+        - Number
+        - Full height
+        - Height of block involved in current style.
+      * - :code:`style`
+        - String
+        - 'black'
+        - CSS style to fill the area defined by other attributes.
 
 Known Issues
 ------------
