@@ -27,10 +27,10 @@ Here is a simple example:
     <script src="qrgen.min.js"></script>
     <div id="qrcode"></div>
     <script>
-    var qrc=QRCanvas({
-            data:location.href
+    var canvas = qrgen.canvas({
+            data: location.href
     });
-    qrc.appendTo(document.getElementById('qrcode'));
+    document.getElementById('qrcode').appendChild(canvas);
     </script>
 
 Check `demo <demo>`__ folder for more advanced examples.
@@ -39,7 +39,7 @@ Check `demo <demo>`__ folder for more advanced examples.
 
 Documentation
 -------------
-- *function* QRCanvas( *options* )
+- *function* qrgen.canvas( *options* )
 
   This is a function to build a QRCanvas object with a QRCode and a canvas built inside.
 
@@ -114,11 +114,7 @@ Documentation
 
            :code:`effect.value` is a ratio between 0 and 0.5.
 
-The returned object has methods below:
-
-- *function* appendTo(*ele*)
-
-  Append the :code:`canvas` to *ele*, works the same as :code:`ele.appendChild(the_canvas)`.
+  A canvas will be returned.
 
 .. [#size] It is highly recommended to use :code:`cellSize` instead of :code:`size` because when :code:`size` is assigned and the calculated :code:`cellSize` is not an integer, the final image may be stretched and thus blurred.
 
