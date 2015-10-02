@@ -1834,13 +1834,14 @@ function forEach(arr, cb) {
     cb.call(arr, arr[i], i);
 }
 
-function extend() {
+/*function extend() {
   var obj = null;
   forEach(arguments, function (arg) {
     if (!obj) obj = arg;
     else for(var key in arg) obj[key] = arg[key];
   });
   return obj;
-}
+}*/
+var extend = Object.assign;
 
 }());

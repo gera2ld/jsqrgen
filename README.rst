@@ -74,11 +74,11 @@ There will be a global variable :code:`qrgen` with methods below:
        - 'M'
        - The correct level of QRCode. When `logo` is assigned, `correctLevel` will be set to `H`.
      * - :code:`foreground` [#color]_
-       - String | Function
+       - Image | Canvas | String | Array
        - 'black'
        - The foreground color or image of the QRCode.
      * - :code:`background` [#color]_
-       - String | Function
+       - Image | Canvas | String | Array
        - 'white'
        - The background color or image of the QRCode.
      * - :code:`logo`
