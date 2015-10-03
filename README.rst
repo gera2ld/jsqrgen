@@ -43,7 +43,7 @@ There will be a global variable :code:`qrgen` with methods below:
 
 - *function* qrgen.canvas( *options* )
 
-  This is a function to build a QRCanvas object with a QRCode and a canvas built inside.
+  This is a function to build a QRCode and render it to a canvas.
 
   *options* is an object with attributes below (all attributes are optional):
 
