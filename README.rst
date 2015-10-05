@@ -37,9 +37,27 @@ Check `demo <demo>`__ folder for more advanced examples.
 
 `中文说明 <http://gerald.top/code/qrgen>`__ `测试页面 <http://gerald.top/code/qrgen-test>`__
 
+Browser Compatibility
+---------------------
+.. list-table::
+
+   * - Firefox
+     - Yes
+   * - Chrome
+     - Yes
+   * - Internet Explorer
+     - 9+
+   * - Opera
+     - 12 [#]_ , 15+
+   * - Safari
+     - Yes
+
+.. [#] Opera 12 (Presto) has problems with :code:`canvas.arcTo`, so effects will probably fail.
+
 Documentation
 -------------
-There will be a global variable :code:`qrgen` with methods below:
+`UMD <https://github.com/umdjs/umd>`__ is supported. The exported object (:code:`qrgen` as global) has
+methods below:
 
 - *function* qrgen.canvas( *options* )
 
@@ -116,7 +134,7 @@ There will be a global variable :code:`qrgen` with methods below:
 
            :code:`effect.value` is a ratio between 0 and 0.5.
 
-  A canvas will be returned.
+  **Return** a canvas.
 
 .. [#size] It is highly recommended to use :code:`cellSize` instead of :code:`size` because when :code:`size` is assigned and the calculated :code:`cellSize` is not an integer, the final image may be stretched and thus blurred.
 
@@ -164,7 +182,3 @@ There will be a global variable :code:`qrgen` with methods below:
         - String
         - 'black'
         - CSS style to fill the area defined by other attributes.
-
-Known Issues
-------------
-Opera 12 (Presto) has problems with :code:`canvas.arcTo`, so effects will probably fail.
