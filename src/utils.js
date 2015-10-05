@@ -65,3 +65,6 @@ function extend() {
   });
   return obj;
 }
+
+// IE 9- does not support Uint8Array
+var Uint8Array = window.Uint8Array || window.Array;

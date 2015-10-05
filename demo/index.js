@@ -1,7 +1,86 @@
 (function ($) {
+  !function () {
+    function shimDataset() {
+      // IE 10- does not support dataset
+      var datasets = [];
+      Object.defineProperty(HTMLElement.prototype, 'dataset', {
+        get: function () {
+          var dataset, ele = this;
+          forEach(datasets, function (item) {
+            if (item.ele === ele) {
+              dataset = item.dataset;
+              return false;
+            }
+          });
+          if (!dataset) {
+            dataset = {};
+            datasets.push({ele: ele, dataset: dataset});
+            forEach(ele.attributes, function (attr) {
+              var name = attr.name;
+              if (/^data-/.test(name)) {
+                name = name.slice(5).replace(/-(\w)/g, function (m, g) {
+                  return g.toUpperCase();
+                });
+                dataset[name] = attr.value;
+              }
+            });
+          }
+          return dataset;
+        },
+      });
+    }
+    function shimClassList() {
+      // IE 9- does not support classList
+      function ClassList(ele) {
+        this.ele = ele;
+        this.add = this._add.bind(this);
+        this.remove = this._remove.bind(this);
+      }
+      ClassList.prototype = {
+        _get: function () {
+          return this.ele.className.trim().split(/\s+/);
+        },
+        _set: function (list) {
+          this.ele.className = list.join(' ');
+        },
+        _add: function (cls) {
+          var list = this._get();
+          var i = list.indexOf(cls);
+          if (i < 0) list.push(cls);
+          this._set(list);
+        },
+        _remove: function (cls) {
+          var list = this._get();
+          var i = list.indexOf(cls);
+          if (~i) list.splice(i, 1);
+          this._set(list);
+        },
+      };
+      var classLists = [];
+      Object.defineProperty(HTMLElement.prototype, 'classList', {
+        get: function () {
+          var classList, ele = this;
+          forEach(classLists, function (item) {
+            if (item.ele === ele) {
+              classList = item.classList;
+              return false;
+            }
+          });
+          if (!classList) {
+            classList = new ClassList(ele);
+            classLists.push({ele: ele, classList: classList});
+          }
+          return classList;
+        },
+      });
+    }
+    if (!document.body.dataset) shimDataset();
+    if (!document.body.classList) shimClassList();
+  }();
+
   function forEach(arr, cb) {
     for (var i = 0; i < arr.length; i ++)
-      cb.call(arr, arr[i], i);
+      if (cb.call(arr, arr[i], i) === false) break;
   }
   function updateLogoTab() {
     forEach(logoTabs, function (ele) {
