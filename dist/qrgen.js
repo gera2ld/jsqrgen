@@ -1,6 +1,6 @@
 /**
  * JSQRGen - Generate characteristic qrcodes with a canvas.
- * @version v2.0.0
+ * @version v2.0.1
  * @license MIT
  * @author Gerald <gera2ld@163.com>
  *
@@ -1852,5 +1852,8 @@ function extend() {
   });
   return obj;
 }
+
+// IE 9- does not support Uint8Array
+var Uint8Array = window.Uint8Array || window.Array;
 
 }());
