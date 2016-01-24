@@ -5,6 +5,7 @@
   "description": "Generate characteristic qrcodes with a canvas.",
   "author": "Gerald <gera2ld@163.com>",
   "license": "MIT",
+  "main": "dist/qrgen.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:gera2ld/jsqrgen.git"
