@@ -8,8 +8,14 @@
  * Copyright (c) 2009 Kazuhiko Arase
  * URL: http://www.d-project.com/
  */
-(function(){
-/**
+!function (root, factory) {
+  if (typeof module === 'object' && module.exports)
+    module.exports = factory(root);
+  else
+    root.qrgen = factory(root);
+}(typeof window !== 'undefined' ? window : this, function (window) {
+
+  /**
  * @desc An edge detector based on canvas.
  * @author Gerald <gera2ld@163.com>
  * @license MIT
@@ -227,23 +233,6 @@ Edger.prototype = {
     };
   },*/
 };
-
-/**
- * @description UMD support
- */
-
-!function (root, factory) {
-  if (typeof define === 'function' && define.amd)
-    define([], factory);
-  else if (typeof module === 'object' && module.exports)
-    module.exports = factory();
-  else
-    root.qrgen = factory();
-}(typeof window !== 'undefined' ? window : this, function () {
-  return {
-    canvas: QRCanvas,
-  };
-});
 
 /*********************************************************************
  * QR Code Generator for JavaScript
@@ -1856,4 +1845,8 @@ function extend() {
 // IE 9- does not support Uint8Array
 var Uint8Array = window.Uint8Array || window.Array;
 
-}());
+
+  return {
+    canvas: QRCanvas,
+  };
+});
