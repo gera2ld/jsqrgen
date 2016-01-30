@@ -1,15 +1,12 @@
-/**
- * @description UMD support
- */
-
 !function (root, factory) {
-  if (typeof define === 'function' && define.amd)
-    define([], factory);
-  else if (typeof module === 'object' && module.exports)
-    module.exports = factory();
+  if (typeof module === 'object' && module.exports)
+    module.exports = factory(root);
   else
-    root.qrgen = factory();
-}(typeof window !== 'undefined' ? window : this, function () {
+    root.qrgen = factory(root);
+}(typeof window !== 'undefined' ? window : this, function (window) {
+
+  <%=contents%>
+
   return {
     canvas: QRCanvas,
   };
