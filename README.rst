@@ -1,13 +1,16 @@
 JS QRGen
 ########
 
-|NPM| |Bower|
+|Bower| |NPM| |Downloads|
+
+.. |Bower| image:: https://img.shields.io/bower/v/jsqrgen.svg
+    :alt: Bower
 
 .. |NPM| image:: https://img.shields.io/npm/v/jsqrgen.svg
     :alt: NPM
 
-.. |Bower| image:: https://img.shields.io/bower/v/jsqrgen.svg
-    :alt: Bower
+.. |Downloads| image:: https://img.shields.io/npm/dt/jsqrgen.svg
+    :alt: Downloads
 
 This is a QRCode generator written in pure javascript, without any dependencies. (jQuery is not needed, either.)
 
@@ -17,16 +20,14 @@ The only requirement is that the browser works with a :code:`canvas`, which is s
 
 Usage
 -----
-- Install with NPM:
+- Installation:
 
   .. code-block:: sh
 
+     # Via NPM
      $ npm install jsqrgen
 
-- Install with bower:
-
-  .. code-block:: sh
-
+     # Via bower
      $ bower install jsqrgen
 
 You may also download `dist/qrgen.min.js` manually.
