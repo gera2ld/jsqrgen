@@ -47,7 +47,7 @@ Here is a simple example:
 
 Check `demo <demo>`__ folder for more advanced examples.
 
-`中文说明 <http://gerald.top/code/qrgen>`__ `测试页面 <http://gerald.top/code/qrgen-test>`__
+`中文说明 <http://gerald.top/code/qrgen>`__ `测试页面 <http://gerald.top/demos/qrgen>`__
 
 Browser Compatibility
 ---------------------
