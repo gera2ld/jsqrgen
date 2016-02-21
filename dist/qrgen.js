@@ -1,6 +1,6 @@
 /**
  * JSQRGen - Generate characteristic qrcodes with a canvas.
- * @version v2.0.1
+ * @version v2.0.2
  * @license MIT
  * @author Gerald <gera2ld@163.com>
  *
@@ -42,18 +42,19 @@ Edger.prototype = {
   /**
    * @desc The callback to tell whether a pixel or an area is outside the edges.
    */
-  isBackground: function() {
+  isBackground: function () {
+    var args = arguments;
     var _this = this;
     var index;
-    if (arguments.length == 1)
-      index = arguments[0];
-    else if (arguments.length == 2)
-      index = arguments[0] + arguments[1] * _this.width;
-    else if (arguments.length == 4) {
-      var x0 = arguments[0];
-      var y0 = arguments[1];
-      var x1 = x0 + arguments[2];
-      var y1 = y0 + arguments[3];
+    if (args.length == 1)
+      index = args[0];
+    else if (args.length == 2)
+      index = args[0] + args[1] * _this.width;
+    else if (args.length == 4) {
+      var x0 = args[0];
+      var y0 = args[1];
+      var x1 = x0 + args[2];
+      var y1 = y0 + args[3];
       if (x0 < 0) x0 = 0;
       if (y0 < 0) y0 = 0;
       if (x1 > _this.width) x1 = _this.width;
@@ -97,24 +98,43 @@ Edger.prototype = {
      * 1 - background
      * 2 - edge of the image
      */
-    var isPixelBg = new Uint8Array(_this.total);
+    var pixelData = new Uint8Array(_this.total);
 
     // BFS
     var queue = [];
     var slice = [].slice;
-    var checkPixel = function (index) {
-      var value = isPixelBg[index];
+    for (var i = 0; i < _this.width; i ++) {
+      checkSurroundings(i);
+      checkSurroundings(_this.total - 1 - i);
+    }
+    for (var i = 0; i < _this.height; i ++) {
+      checkSurroundings(i * _this.width);
+      checkSurroundings((i + 1) * _this.width - 1);
+    }
+    var head = 0;
+    while (head < queue.length) {
+      var index = queue[head];
+      if (index > _this.width) checkRow(index - _this.width);
+      checkRow(index, true);
+      if (index + _this.width < _this.total) checkRow(index + _this.width);
+      head ++;
+    }
+    _this.totalBackground = head;
+
+    function isBgPixel(index) {
+      var value = pixelData[index];
       if (!value) {
         var offset = index * 4;
         var colorArr = slice.call(imageData.data, offset, offset + 4);
         if (_this.isBackgroundColor(colorArr)) {
-          value = isPixelBg[index] = 1;
-        } else
-          value = isPixelBg[index] = 2;
+          value = pixelData[index] = 1;
+        } else {
+          value = pixelData[index] = 2;
+        }
       }
       return value === 1;
-    };
-    var checkCircular = function (index) {
+    }
+    function checkSurroundings(index) {
       if (_this.data[index]) return;
       var x0 = index % _this.width;
       var y0 = ~~ (index / _this.width);
@@ -124,7 +144,7 @@ Edger.prototype = {
           var dx = x - x0;
           var dy = y - y0;
           if (dx * dx + dy * dy < R * R) {
-            if (!checkPixel(x + y * _this.width)) {
+            if (!isBgPixel(x + y * _this.width)) {
               _this.data[index] = 2;
               return;
             }
@@ -137,29 +157,12 @@ Edger.prototype = {
       if (rect.right < 0 || rect.right < x0) rect.right = x0;
       if (rect.bottom < 0 || rect.bottom < y0) rect.bottom = y0;
       if (rect.left < 0 || rect.left > x0) rect.left = x0;*/
-    };
-    var checkThree = function (index, excludeSelf) {
-      if (index % _this.width) checkCircular(index - 1);
-      if (!excludeSelf) checkCircular(index);
-      if ((index + 1) % _this.width) checkCircular(index + 1);
-    };
-    for (var i = 0; i < _this.width; i ++) {
-      checkCircular(i);
-      checkCircular(_this.total - 1 - i);
     }
-    for (var i = 0; i < _this.height; i ++) {
-      checkCircular(i * _this.width);
-      checkCircular((i + 1) * _this.width - 1);
+    function checkRow(index, excludeSelf) {
+      if (index % _this.width) checkSurroundings(index - 1);
+      if (!excludeSelf) checkSurroundings(index);
+      if ((index + 1) % _this.width) checkSurroundings(index + 1);
     }
-    var head = 0;
-    while (head < queue.length) {
-      var index = queue[head];
-      if (index > _this.width) checkThree(index - _this.width);
-      checkThree(index, true);
-      if (index + _this.width < _this.total) checkThree(index + _this.width);
-      head ++;
-    }
-    _this.totalBackground = head;
   },
   /**
    * @desc Tranform a color number to a RGBA array.
