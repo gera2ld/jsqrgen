@@ -14,7 +14,7 @@ JS QRGen
 
 .. default-role:: code
 
-This is a QRCode generator written in pure javascript, without any dependencies. (jQuery is not needed, either.)
+This is a QRCode generator written in pure javascript.
 
 Based on `Kazuhiko Arase's QRCode <http://www.d-project.com/>`__ .
 
@@ -48,8 +48,6 @@ Here is a simple example:
     </script>
 
 Check `demo <demo>`__ folder for more advanced examples.
-
-`中文说明 <http://gerald.top/code/qrgen>`__ `测试页面 <http://gerald.top/demos/qrgen>`__
 
 Browser Compatibility
 ---------------------
