@@ -146,12 +146,13 @@
 
   var q = $('#qrcanvas');
   var t = $('#cellEffect');
+  var canvas;
   $('#qrgen').onclick = function () {
     var s = t.value / 100;
     var colorIn = $('#colorIn').value;
     var colorOut = $('#colorOut').value;
     var colorFore = $('#colorFore').value;
-    var options={
+    var options = {
       cellSize: Number($('#cellSize').value),
       foreground: [
         // foreground color
@@ -168,7 +169,7 @@
       data: $('#qrtext').value,
       typeNumber: Number($('#typeNumber').value),
     };
-    q.innerHTML='';
+    //q.innerHTML='';
     if (cbLogo.checked) {
       options.logo = {
         clearEdges: Number($('#qrclearedges').value),
@@ -192,6 +193,8 @@
       options.effect = {key: 'round', value: s};
     else
       options.effect = {key: 'liquid', value: -s};
-    q.appendChild(qrgen.canvas(options));
+    options.reuseCanvas = canvas;
+    canvas = qrgen.canvas(options);
+    q.appendChild(canvas);
   };
 })(document.querySelector.bind(document));

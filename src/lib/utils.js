@@ -3,12 +3,11 @@
  * @author Gerald <gera2ld@163.com>
  * @license MIT
  */
-'use strict';
 
 /**
  * @desc Create a new canvas.
- * @param width {Int} Width of the canvas.
- * @param height {Int} Height of the canvas.
+ * @param {Int} width Width of the canvas.
+ * @param {Int} height Height of the canvas.
  * @return {Canvas}
  */
 function getCanvas(width, height) {
@@ -20,8 +19,8 @@ function getCanvas(width, height) {
 
 /**
  * @desc Initialize the canvas with given image or colors.
- * @param canvas {Canvas} The canvas to initialize.
- * @param options {Object}
+ * @param {Canvas} canvas The canvas to initialize.
+ * @param {Object} options
  *    data: {Image} or {Array} or {String}
  *    size: {Int}
  *    cellSize: {Int}
@@ -56,7 +55,7 @@ function forEach(arr, cb) {
     cb.call(arr, arr[i], i);
 }
 
-function extend() {
+function assign() {
   var obj;
   forEach(arguments, function (arg) {
     if (!obj) obj = arg;

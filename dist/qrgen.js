@@ -20,7 +20,6 @@
  * @author Gerald <gera2ld@163.com>
  * @license MIT
  */
-'use strict';
 
 function Edger(canvas, options) {
   var _this = this;
@@ -1402,7 +1401,6 @@ var qrcode = function() {
  * @author Gerald <gera2ld@163.com>
  * @license MIT
  */
-'use strict';
 
 function renderByCanvas(options) {
 
@@ -1619,9 +1617,9 @@ function renderByCanvas(options) {
 
   function drawForeground() {
     var size = common.size;
-    var canvas_fg = getCanvas(size, size);
-    initCanvas(canvas_fg, extend({}, common, {data: options.foreground}));
-    var ctx = canvas_fg.getContext('2d');
+    var canvasFore = getCanvas(size, size);
+    initCanvas(canvasFore, assign({}, common, {data: options.foreground}));
+    var ctx = canvasFore.getContext('2d');
     var fore = ctx.getImageData(0, 0, size, size);
     var raw = common.context.getImageData(0, 0, size, size);
     var total = size * size;
@@ -1636,7 +1634,7 @@ function renderByCanvas(options) {
       }
     }
     ctx.putImageData(fore, 0, 0);
-    return canvas_fg;
+    return canvasFore;
   }
 
   function draw() {
@@ -1644,10 +1642,10 @@ function renderByCanvas(options) {
     // so that there will not be gaps between cells
     common.cellSize = Math.ceil(options.cellSize);
     var size = common.size = common.cellSize * options.count;
-    var canvas_data = getCanvas(size, size);
-    var ctx_data = common.context = canvas_data.getContext('2d');
-    ctx_data.fillStyle = colorLight;
-    ctx_data.fillRect(0, 0, size, size);
+    var canvasData = getCanvas(size, size);
+    var contextData = common.context = canvasData.getContext('2d');
+    contextData.fillStyle = colorLight;
+    contextData.fillRect(0, 0, size, size);
     var logo = options.logo;
     prepareLogo();
     drawCells();
@@ -1655,19 +1653,23 @@ function renderByCanvas(options) {
 
     var fore = drawForeground();
     var canvas = getCanvas(size, size);
-    initCanvas(canvas, extend({}, common, {data: options.background}));
-    var ctx_bg = canvas.getContext('2d');
-    ctx_bg.drawImage(fore, 0, 0);
-    if (logo.canvas) ctx_bg.drawImage(logo.canvas, logo.x, logo.y);
+    initCanvas(canvas, assign({}, common, {data: options.background}));
+    var context = canvas.getContext('2d');
+    context.drawImage(fore, 0, 0);
+    if (logo.canvas) context.drawImage(logo.canvas, logo.x, logo.y);
     common.context = null;
 
-    // if the size is not expected,
-    // draw the QRCode to another canvas with the image stretched
-    if(size != options.size) {
-      var anotherCanvas = getCanvas(options.size, options.size);
-      var ctx_another = anotherCanvas.getContext('2d');
-      ctx_another.drawImage(canvas, 0, 0, options.size, options.size);
-      canvas = anotherCanvas;
+    var canvasTarget = options.reuseCanvas;
+    if (canvasTarget) {
+      canvasTarget.width = canvasTarget.height = options.size;
+    } else if (size != options.size) {
+      // strech image if the size is not expected
+      canvasTarget = getCanvas(options.size, options.size);
+    }
+    if (canvasTarget) {
+      var contextTarget = canvasTarget.getContext('2d');
+      contextTarget.drawImage(canvas, 0, 0, options.size, options.size);
+      canvas = canvasTarget;
     }
 
     return canvas;
@@ -1736,7 +1738,7 @@ function getQRCode(options) {
     margin: -1,
     size: .15,
   };
-  if (options.logo) extend(logo, options.logo);
+  if (options.logo) assign(logo, options.logo);
   // if a logo is to be added, correctLevel is set to H
   if (logo.image || logo.text) {
     correctLevel = 'H';
@@ -1770,6 +1772,7 @@ function getQRCode(options) {
     logo: logo,
     qr: qr,
     effect: effect,
+    reuseCanvas: options.reuseCanvas,
   };
 }
 
@@ -1782,12 +1785,11 @@ function QRCanvas(options) {
  * @author Gerald <gera2ld@163.com>
  * @license MIT
  */
-'use strict';
 
 /**
  * @desc Create a new canvas.
- * @param width {Int} Width of the canvas.
- * @param height {Int} Height of the canvas.
+ * @param {Int} width Width of the canvas.
+ * @param {Int} height Height of the canvas.
  * @return {Canvas}
  */
 function getCanvas(width, height) {
@@ -1799,8 +1801,8 @@ function getCanvas(width, height) {
 
 /**
  * @desc Initialize the canvas with given image or colors.
- * @param canvas {Canvas} The canvas to initialize.
- * @param options {Object}
+ * @param {Canvas} canvas The canvas to initialize.
+ * @param {Object} options
  *    data: {Image} or {Array} or {String}
  *    size: {Int}
  *    cellSize: {Int}
@@ -1835,7 +1837,7 @@ function forEach(arr, cb) {
     cb.call(arr, arr[i], i);
 }
 
-function extend() {
+function assign() {
   var obj;
   forEach(arguments, function (arg) {
     if (!obj) obj = arg;

@@ -3,7 +3,6 @@
  * @author Gerald <gera2ld@163.com>
  * @license MIT
  */
-'use strict';
 
 function Edger(canvas, options) {
   var _this = this;

@@ -12,11 +12,13 @@ JS QRGen
 .. |Downloads| image:: https://img.shields.io/npm/dt/jsqrgen.svg
     :alt: Downloads
 
+.. default-role:: code
+
 This is a QRCode generator written in pure javascript, without any dependencies. (jQuery is not needed, either.)
 
 Based on `Kazuhiko Arase's QRCode <http://www.d-project.com/>`__ .
 
-The only requirement is that the browser works with a :code:`canvas`, which is supported by most modern browsers.
+The only requirement is that the browser works with a `canvas`, which is supported by most modern browsers.
 
 Usage
 -----
@@ -64,11 +66,11 @@ Browser Compatibility
    * - Safari
      - Yes
 
-.. [#] Opera 12 (Presto) has problems with :code:`canvas.arcTo`, so effects will probably fail.
+.. [#] Opera 12 (Presto) has problems with `canvas.arcTo`, so effects will probably fail.
 
 Documentation
 -------------
-`UMD <https://github.com/umdjs/umd>`__ is supported. The exported object (:code:`qrgen` as global) has
+`UMD <https://github.com/umdjs/umd>`__ is supported. The exported object (`qrgen` as global) has
 methods below:
 
 - *function* qrgen.canvas( *options* )
@@ -83,68 +85,72 @@ methods below:
        - Type
        - Default
        - Description
-     * - :code:`data`
+     * - `data`
        - String
        - ''
        - The data to be encoded in the QRCode, text will be encoded in UTF-8.
-     * - :code:`cellSize` [#size]_
+     * - `cellSize` [#size]_
        - Number
        - 2
        - The pixel width or height of a cell. Default value is used only if neither `cellSize` nor `size` is provided.
-     * - :code:`size` [#size]_
+     * - `size` [#size]_
        - Number
        - None
        - The pixel width or height of the entire image, ignored if *cellSize* is assigned.
-     * - :code:`typeNumber`
+     * - `typeNumber`
        - Number [1..10]
        - Auto
        - The type number of the QRCode. If too small to contain the data, the smallest valid type number will be used instead.
-     * - :code:`correctLevel`
+     * - `correctLevel`
        - String {'L', 'M', 'Q', 'H'}
        - 'M'
        - The correct level of QRCode. When `logo` is assigned, `correctLevel` will be set to `H`.
-     * - :code:`foreground` [#color]_
+     * - `foreground` [#color]_
        - Image | Canvas | String | Array
        - 'black'
        - The foreground color or image of the QRCode.
-     * - :code:`background` [#color]_
+     * - `background` [#color]_
        - Image | Canvas | String | Array
        - 'white'
        - The background color or image of the QRCode.
-     * - :code:`logo`
+     * - `logo`
        - Object
        - {}
        - The object may have attributes below (all optional):
 
          if image:
 
-         - :code:`image`: An *Image* element with the image to be drawn in the middle of the canvas.
+         - `image`: An *Image* element with the image to be drawn in the middle of the canvas.
 
          if text:
 
-         - :code:`text`: The text to be drawn as logo.
-         - :code:`color`: Logo text color, default as `black`.
-         - :code:`fontStyle`: Logo text style, e.g. `italic bold`.
-         - :code:`fontFace`: Logo text font face, default as `Cursive`.
+         - `text`: The text to be drawn as logo.
+         - `color`: Logo text color, default as `black`.
+         - `fontStyle`: Logo text style, e.g. `italic bold`.
+         - `fontFace`: Logo text font face, default as `Cursive`.
 
          common attributes:
 
-         - :code:`clearEdges`: A number to decide the level to clear the cells broken by the image, default as `0`.
-         - :code:`margin`: The pixel gap between the image and the QRCode cells around it, default as `2`.
-         - :code:`size`: A float stands for the ratio of logo size to the QRCode size, default as `.15`, which is recommended.
+         - `clearEdges`: A number to decide the level to clear the cells broken by the image, default as `0`.
+         - `margin`: The pixel gap between the image and the QRCode cells around it, default as `2`.
+         - `size`: A float stands for the ratio of logo size to the QRCode size, default as `.15`, which is recommended.
 
-     * - :code:`effect`
+     * - `effect`
        - Object
        - {}
-       - The object may have two attributes: :code:`key` and :code:`value`.
+       - The object may have two attributes: `key` and `value`.
 
-         - :code:`effect.key = 'round'`
+         - `effect.key = 'round'`
 
-           :code:`effect.value` is a ratio between 0 and 0.5, making cells round with a border-radius of `value` * `cellSize`.
+           `effect.value` is a ratio between 0 and 0.5, making cells round with a border-radius of `value` * `cellSize`.
 
-         - :code:`effect.key = 'liquid'`
+         - `effect.key = 'liquid'`
 
-           :code:`effect.value` is a ratio between 0 and 0.5.
+           `effect.value` is a ratio between 0 and 0.5.
+     * - `reuseCanvas`
+       - Canvas
+       - None
+       - The final image will be painted to `reuseCanvas` if provided.
 
   **Return** a canvas.
 

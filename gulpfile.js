@@ -30,4 +30,4 @@ gulp.task('default', () => (
   .pipe(gulp.dest('dist/'))
 ));
 
-gulp.task('watch', () => gulp.watch('src/*.js', ['default']));
+gulp.task('watch', () => gulp.watch('src/**/*.js', ['default']));
