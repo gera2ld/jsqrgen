@@ -1738,7 +1738,8 @@ function getQRCode(options) {
     margin: -1,
     size: .15,
   };
-  if (options.logo) assign(logo, options.logo);
+  var _logo = options.logo;
+  if (_logo && (_logo.image || _logo.text)) assign(logo, _logo);
   // if a logo is to be added, correctLevel is set to H
   if (logo.image || logo.text) {
     correctLevel = 'H';
