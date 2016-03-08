@@ -1615,6 +1615,23 @@ function renderByCanvas(options) {
     return ~~ (fg * alpha / 255 + bg * (255 - alpha) / 255);
   }
 
+  function transformAlpha() {
+    var size = common.size;
+    var context = common.context;
+    var imageData = context.getImageData(0, 0, size, size);
+    var total = size * size;
+    for (var i = 0; i < total; i ++) {
+      var offset = i * 4;
+      var alpha = imageData.data[offset + 3];
+      if (alpha < 255) {
+        imageData.data[offset] = transformColor(imageData.data[offset], 255, alpha);
+        imageData.data[offset + 1] = transformColor(imageData.data[offset + 1], 255, alpha);
+        imageData.data[offset + 2] = transformColor(imageData.data[offset + 2], 255, alpha);
+        imageData.data[offset + 3] = 255;
+      }
+    }
+  }
+
   function drawForeground() {
     var size = common.size;
     var canvasFore = getCanvas(size, size);
@@ -1625,12 +1642,11 @@ function renderByCanvas(options) {
     var total = size * size;
     for (var i = 0; i < total; i ++) {
       var offset = i * 4;
-      var alpha = 255 - raw.data[offset];
-      if (alpha < 255) {
-        fore.data[offset] = transformColor(fore.data[offset], 255, alpha);
-        fore.data[offset + 1] = transformColor(fore.data[offset + 1], 255, alpha);
-        fore.data[offset + 2] = transformColor(fore.data[offset + 2], 255, alpha);
-        fore.data[offset + 3] = 255;
+      if (raw.data[offset]) {
+        fore.data[offset] = 0;
+        fore.data[offset + 1] = 0;
+        fore.data[offset + 2] = 0;
+        fore.data[offset + 3] = 0;
       }
     }
     ctx.putImageData(fore, 0, 0);
@@ -1646,7 +1662,6 @@ function renderByCanvas(options) {
     var contextData = common.context = canvasData.getContext('2d');
     contextData.fillStyle = colorLight;
     contextData.fillRect(0, 0, size, size);
-    var logo = options.logo;
     prepareLogo();
     drawCells();
     clearLogo();
@@ -1656,7 +1671,9 @@ function renderByCanvas(options) {
     initCanvas(canvas, assign({}, common, {data: options.background}));
     var context = canvas.getContext('2d');
     context.drawImage(fore, 0, 0);
+    var logo = options.logo;
     if (logo.canvas) context.drawImage(logo.canvas, logo.x, logo.y);
+    options.noAlpha && transformAlpha();
     common.context = null;
 
     var canvasTarget = options.reuseCanvas;
@@ -1687,13 +1704,13 @@ function renderByCanvas(options) {
   return draw();
 }
 
-function getQRCode(options) {
+var defaults = {
   // typeNumber belongs to 1..10
   // will be increased to the smallest valid number if too small
-  var typeNumber = options.typeNumber || 1;
+  typeNumber: 1,
 
   // correctLevel can be 'L', 'M', 'Q' or 'H'
-  var correctLevel = options.correctLevel || 'M';
+  correctLevel: 'M',
 
   // foreground and background may be an image or a style string
   // or an array of objects with attributes below:
@@ -1702,16 +1719,23 @@ function getQRCode(options) {
   // * cols | width: default size
   // * rows | height: default size
   // * style: default 'black'
-  var foreground = options.foreground || 'black';
-  var background = options.background || null;
+  foreground: 'black',
+  background: null,
 
   // data MUST be a string
-  var data = options.data || '';
+  data: '',
 
   // effect: {key: [round|liquid], value: 0-0.5}
-  var effect = options.effect || {};
+  effect: {},
 
-  /* an image or text can be used as a logo
+  // Remove alpha channel to make the image not transparent
+  noAlpha: true,
+
+  // Null or a canvas to be reused
+  reuseCanvas: null,
+
+  /**
+   * an image or text can be used as a logo
    * logo: {
    *   // image
    *   image: Image,
@@ -1731,6 +1755,10 @@ function getQRCode(options) {
    *   size: float, default .15 stands for 15% of the QRCode
    * }
    */
+  logo: {},
+};
+
+function getQRCode(_options) {
   var logo = {
     color: 'black',
     fontFace: 'Cursive',
@@ -1738,17 +1766,20 @@ function getQRCode(options) {
     margin: -1,
     size: .15,
   };
-  var _logo = options.logo;
+  var options = assign({}, defaults, _options, {
+    logo: logo,
+  });
+  var _logo = _options.logo;
   if (_logo && (_logo.image || _logo.text)) assign(logo, _logo);
   // if a logo is to be added, correctLevel is set to H
   if (logo.image || logo.text) {
-    correctLevel = 'H';
+    options.correctLevel = 'H';
     if (logo.margin < 0) logo.margin = logo.image ? 0 : 2;
   }
 
   // Generate QRCode data with qrcode-light.js
-  var qr = qrcode(typeNumber, correctLevel);
-  qr.addData(data);
+  var qr = qrcode(options.typeNumber, options.correctLevel);
+  qr.addData(options.data);
   qr.make();
 
   // calculate QRCode and cell sizes
@@ -1763,18 +1794,12 @@ function getQRCode(options) {
     size = options.size;
     cellSize = size / count;
   }
-
-  return {
+  return assign(options, {
     cellSize: cellSize,
     size: size,
-    count: count,
-    foreground: foreground,
-    background: background,
-    logo: logo,
     qr: qr,
-    effect: effect,
-    reuseCanvas: options.reuseCanvas,
-  };
+    count: count,
+  });
 }
 
 function QRCanvas(options) {

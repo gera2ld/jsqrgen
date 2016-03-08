@@ -149,6 +149,10 @@ methods below:
        - Canvas
        - None
        - The final image will be painted to `reuseCanvas` if provided.
+     * - `noAlpha`
+       - Boolean
+       - true
+       - Whether alpha channel should be removed.
 
   **Return** a canvas.
 
