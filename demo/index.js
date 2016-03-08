@@ -152,6 +152,7 @@
     var colorIn = $('#colorIn').value;
     var colorOut = $('#colorOut').value;
     var colorFore = $('#colorFore').value;
+    var colorBack = $('#colorBack').value;
     var options = {
       cellSize: Number($('#cellSize').value),
       foreground: [
@@ -166,6 +167,7 @@
         {row: -5, rows: 3, col: 2, cols: 3, style: colorIn},
         {row: 2, rows: 3, col: -5, cols: 3, style: colorIn},
       ],
+      background: colorBack,
       data: $('#qrtext').value,
       typeNumber: Number($('#typeNumber').value),
     };
