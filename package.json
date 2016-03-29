@@ -7,8 +7,8 @@
   "license": "MIT",
   "main": "dist/qrgen.js",
   "scripts": {
-    "build": "gulp",
-    "dev": "gulp && gulp watch"
+    "dev": "gulp && gulp watch",
+    "version": "gulp && git add -A -f dist"
   },
   "repository": {
     "type": "git",
