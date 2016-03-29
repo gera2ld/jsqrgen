@@ -1,6 +1,6 @@
 /**
  * JSQRGen - Generate characteristic qrcodes with a canvas.
- * @version v2.0.4
+ * @version v2.0.6
  * @license MIT
  * @author Gerald <gera2ld@163.com>
  *
@@ -236,24 +236,26 @@ Edger.prototype = {
   },*/
 };
 
-/*********************************************************************
- * QR Code Generator for JavaScript
- *
- * Copyright (c) 2009 Kazuhiko Arase
- *
- * URL: http://www.d-project.com/
- *
- * Licensed under the MIT license:
- *	http://www.opensource.org/licenses/mit-license.php
- *
- * The word 'QR Code' is registered trademark of
- * DENSO WAVE INCORPORATED
- *	http://www.denso-wave.com/qrcode/faqpatent-e.html
- *
- * Modified by: Gerald <gera2ld@163.com>
- *	* Removed unneeded code
- *	* Added UTF-8 encoding
- *********************************************************************/
+//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+//	http://www.opensource.org/licenses/mit-license.php
+//
+// The word 'QR Code' is registered trademark of
+// DENSO WAVE INCORPORATED
+//	http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//
+// Modified by: Gerald <gera2ld@163.com>
+//	* Removed unneeded code
+//	* Added UTF-8 encoding
+//-----------------------------------------------------------------------
 
 var qrcode = function() {
 
@@ -282,9 +284,14 @@ var qrcode = function() {
 
 		var makeImpl = function(test, maskPattern) {
 
-			// createData first to check the _typeNumber
-			if (_dataCache == null) {
-				_dataCache = createData(_typeNumber, _errorCorrectLevel, _dataList);
+			while (_dataCache == null) {
+        try {
+          _dataCache = createData(_typeNumber, _errorCorrectLevel, _dataList);
+          break;
+        } catch (e) {
+          _typeNumber ++;
+          if (_typeNumber > 40) throw e;
+        }
 			}
 
 			_moduleCount = _typeNumber * 4 + 17;
@@ -570,42 +577,32 @@ var qrcode = function() {
 			return data;
 		};
 
-		/*
-		 * find the smallest valid typeNumber
-		 */
 		var createData = function(typeNumber, errorCorrectLevel, dataList) {
-			//var test=typeNumber<1;
-			//if(test) typeNumber=1;
 
-			while(1) {
-				var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
+			var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
 
-				var buffer = qrBitBuffer();
+			var buffer = qrBitBuffer();
 
-				for (var i = 0; i < dataList.length; i += 1) {
-					var data = dataList[i];
-					buffer.put(data.getMode(), 4);
-					buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
-					data.write(buffer);
-				}
-
-				// calc num max data.
-				var totalDataCount = 0;
-				for (var i = 0; i < rsBlocks.length; i += 1) {
-					totalDataCount += rsBlocks[i].dataCount;
-				}
-
-				if (buffer.getLengthInBits() > totalDataCount * 8) {
-					if(/*test&&*/typeNumber<10) typeNumber++;
-					else throw new Error('code length overflow. ('
-						+ buffer.getLengthInBits()
-						+ '>'
-						+ totalDataCount * 8
-						+ ')');
-				} else break;
+			for (var i = 0; i < dataList.length; i += 1) {
+				var data = dataList[i];
+				buffer.put(data.getMode(), 4);
+				buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+				data.write(buffer);
 			}
 
-			/*if(test)*/ _typeNumber=typeNumber;
+			// calc num max data.
+			var totalDataCount = 0;
+			for (var i = 0; i < rsBlocks.length; i += 1) {
+				totalDataCount += rsBlocks[i].dataCount;
+			}
+
+			if (buffer.getLengthInBits() > totalDataCount * 8) {
+				throw new Error('code length overflow. ('
+					+ buffer.getLengthInBits()
+					+ '>'
+					+ totalDataCount * 8
+					+ ')');
+			}
 
 			// end code
 			if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
@@ -662,27 +659,31 @@ var qrcode = function() {
 	// qrcode.stringToBytes
 	//---------------------------------------------------------------------
 
-	/*qrcode.stringToBytes = function(s) {
-		var bytes = new Array();
-		for (var i = 0; i < s.length; i += 1) {
+  // qrcode.stringToBytes = function(s) {
+	// 	var bytes = new Array();
+	// 	for (var i = 0; i < s.length; i += 1) {
+	// 		var c = s.charCodeAt(i);
+	// 		bytes.push(c & 0xff);
+	// 	}
+	// 	return bytes;
+	// };
+ 	qrcode.stringToBytes = function(s) {
+		var bytes = [];
+		s = s.replace(/\r\n/g, '\n');
+		for (var i = 0; i < s.length; i ++) {
 			var c = s.charCodeAt(i);
-			bytes.push(c & 0xff);
-		}
-		return bytes;
-	};*/
- 	qrcode.stringToBytes=function(s) {
-		var bytes=new Array(),i,c;
-		s=s.replace(/\r\n/g,'\n');
-		for(i=0;i<s.length;i++) {
-			c=s.charCodeAt(i);
-			if(c<128) bytes.push(c);
-			else if(c<2048) {
-				bytes.push((c>>6)|192);
-				bytes.push((c&63)|128);
+			if (c < 128) bytes.push(c);
+			else if (c < 2048) {
+        bytes.push(
+          (c >> 6) | 192,
+          (c & 63) | 128
+        );
 			} else {
-				bytes.push((c>>12)|224);
-				bytes.push(((c>>6)&63)|128);
-				bytes.push((c&63)|128);
+        bytes.push(
+          (c >> 12) | 224,
+          ((c >> 6) & 63) | 128,
+          (c & 63) | 128
+        );
 			}
 		}
 		return bytes;
@@ -1257,6 +1258,186 @@ var qrcode = function() {
 			[4, 69, 43, 1, 70, 44],
 			[6, 43, 19, 2, 44, 20],
 			[6, 43, 15, 2, 44, 16]
+
+      // 11
+      [4, 101, 81],
+      [1, 80, 50, 4, 81, 51],
+      [4, 50, 22, 4, 51, 23],
+      [3, 36, 12, 8, 37, 13],
+
+      // 12
+      [2, 116, 92, 2, 117, 93],
+      [6, 58, 36, 2, 59, 37],
+      [4, 46, 20, 6, 47, 21],
+      [7, 42, 14, 4, 43, 15],
+
+      // 13
+      [4, 133, 107],
+      [8, 59, 37, 1, 60, 38],
+      [8, 44, 20, 4, 45, 21],
+      [12, 33, 11, 4, 34, 12],
+
+      // 14
+      [3, 145, 115, 1, 146, 116],
+      [4, 64, 40, 5, 65, 41],
+      [11, 36, 16, 5, 37, 17],
+      [11, 36, 12, 5, 37, 13],
+
+      // 15
+      [5, 109, 87, 1, 110, 88],
+      [5, 65, 41, 5, 66, 42],
+      [5, 54, 24, 7, 55, 25],
+      [11, 36, 12, 7, 37, 13],
+
+      // 16
+      [5, 122, 98, 1, 123, 99],
+      [7, 73, 45, 3, 74, 46],
+      [15, 43, 19, 2, 44, 20],
+      [3, 45, 15, 13, 46, 16],
+
+      // 17
+      [1, 135, 107, 5, 136, 108],
+      [10, 74, 46, 1, 75, 47],
+      [1, 50, 22, 15, 51, 23],
+      [2, 42, 14, 17, 43, 15],
+
+      // 18
+      [5, 150, 120, 1, 151, 121],
+      [9, 69, 43, 4, 70, 44],
+      [17, 50, 22, 1, 51, 23],
+      [2, 42, 14, 19, 43, 15],
+
+      // 19
+      [3, 141, 113, 4, 142, 114],
+      [3, 70, 44, 11, 71, 45],
+      [17, 47, 21, 4, 48, 22],
+      [9, 39, 13, 16, 40, 14],
+
+      // 20
+      [3, 135, 107, 5, 136, 108],
+      [3, 67, 41, 13, 68, 42],
+      [15, 54, 24, 5, 55, 25],
+      [15, 43, 15, 10, 44, 16],
+
+      // 21
+      [4, 144, 116, 4, 145, 117],
+      [17, 68, 42],
+      [17, 50, 22, 6, 51, 23],
+      [19, 46, 16, 6, 47, 17],
+
+      // 22
+      [2, 139, 111, 7, 140, 112],
+      [17, 74, 46],
+      [7, 54, 24, 16, 55, 25],
+      [34, 37, 13],
+
+      // 23
+      [4, 151, 121, 5, 152, 122],
+      [4, 75, 47, 14, 76, 48],
+      [11, 54, 24, 14, 55, 25],
+      [16, 45, 15, 14, 46, 16],
+
+      // 24
+      [6, 147, 117, 4, 148, 118],
+      [6, 73, 45, 14, 74, 46],
+      [11, 54, 24, 16, 55, 25],
+      [30, 46, 16, 2, 47, 17],
+
+      // 25
+      [8, 132, 106, 4, 133, 107],
+      [8, 75, 47, 13, 76, 48],
+      [7, 54, 24, 22, 55, 25],
+      [22, 45, 15, 13, 46, 16],
+
+      // 26
+      [10, 142, 114, 2, 143, 115],
+      [19, 74, 46, 4, 75, 47],
+      [28, 50, 22, 6, 51, 23],
+      [33, 46, 16, 4, 47, 17],
+
+      // 27
+      [8, 152, 122, 4, 153, 123],
+      [22, 73, 45, 3, 74, 46],
+      [8, 53, 23, 26, 54, 24],
+      [12, 45, 15, 28, 46, 16],
+
+      // 28
+      [3, 147, 117, 10, 148, 118],
+      [3, 73, 45, 23, 74, 46],
+      [4, 54, 24, 31, 55, 25],
+      [11, 45, 15, 31, 46, 16],
+
+      // 29
+      [7, 146, 116, 7, 147, 117],
+      [21, 73, 45, 7, 74, 46],
+      [1, 53, 23, 37, 54, 24],
+      [19, 45, 15, 26, 46, 16],
+
+      // 30
+      [5, 145, 115, 10, 146, 116],
+      [19, 75, 47, 10, 76, 48],
+      [15, 54, 24, 25, 55, 25],
+      [23, 45, 15, 25, 46, 16],
+
+      // 31
+      [13, 145, 115, 3, 146, 116],
+      [2, 74, 46, 29, 75, 47],
+      [42, 54, 24, 1, 55, 25],
+      [23, 45, 15, 28, 46, 16],
+
+      // 32
+      [17, 145, 115],
+      [10, 74, 46, 23, 75, 47],
+      [10, 54, 24, 35, 55, 25],
+      [19, 45, 15, 35, 46, 16],
+
+      // 33
+      [17, 145, 115, 1, 146, 116],
+      [14, 74, 46, 21, 75, 47],
+      [29, 54, 24, 19, 55, 25],
+      [11, 45, 15, 46, 46, 16],
+
+      // 34
+      [13, 145, 115, 6, 146, 116],
+      [14, 74, 46, 23, 75, 47],
+      [44, 54, 24, 7, 55, 25],
+      [59, 46, 16, 1, 47, 17],
+
+      // 35
+      [12, 151, 121, 7, 152, 122],
+      [12, 75, 47, 26, 76, 48],
+      [39, 54, 24, 14, 55, 25],
+      [22, 45, 15, 41, 46, 16],
+
+      // 36
+      [6, 151, 121, 14, 152, 122],
+      [6, 75, 47, 34, 76, 48],
+      [46, 54, 24, 10, 55, 25],
+      [2, 45, 15, 64, 46, 16],
+
+      // 37
+      [17, 152, 122, 4, 153, 123],
+      [29, 74, 46, 14, 75, 47],
+      [49, 54, 24, 10, 55, 25],
+      [24, 45, 15, 46, 46, 16],
+
+      // 38
+      [4, 152, 122, 18, 153, 123],
+      [13, 74, 46, 32, 75, 47],
+      [48, 54, 24, 14, 55, 25],
+      [42, 45, 15, 32, 46, 16],
+
+      // 39
+      [20, 147, 117, 4, 148, 118],
+      [40, 75, 47, 7, 76, 48],
+      [43, 54, 24, 22, 55, 25],
+      [10, 45, 15, 67, 46, 16],
+
+      // 40
+      [19, 148, 118, 6, 149, 119],
+      [18, 75, 47, 31, 76, 48],
+      [34, 54, 24, 34, 55, 25],
+      [20, 45, 15, 61, 46, 16]
 		];
 
 		var qrRSBlock = function(totalCount, dataCount) {
