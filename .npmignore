@@ -1,4 +1,5 @@
 demo
-docs
 src
+gh-pages
+tools
 gulpfile.js

@@ -11,8 +11,8 @@ Based on [Kazuhiko Arase's QRCode](http://www.d-project.com/).
 
 The only requirement is that the browser works with a `canvas`, which is supported by most modern browsers.
 
-Document
+More
 ---
+* [Demo](http://gera2ld.github.io/jsqrgen/demo/)
 * [Wiki](https://github.com/gera2ld/jsqrgen/wiki)
 * [中文文档](https://gerald.top/code/qrgen)
-
