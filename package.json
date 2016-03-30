@@ -8,7 +8,9 @@
   "main": "dist/qrgen.js",
   "scripts": {
     "dev": "gulp && gulp watch",
-    "version": "gulp && git add -A -f dist"
+    "preversion": "gulp",
+    "version": "git add -A -f dist",
+    "gh-pages": "sh tools/build-gh.sh"
   },
   "repository": {
     "type": "git",
