@@ -1,6 +1,6 @@
 {
   "name": "jsqrgen",
-  "version": "2.0.4",
+  "version": "__VERSION__",
   "description": "Generate characteristic qrcodes with a canvas.",
   "authors": [
     "Gerald <gera2ld@163.com>"
