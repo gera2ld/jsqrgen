@@ -37,4 +37,4 @@ gulp.task('bower', ['build'], () => (
   .pipe(gulp.dest('.'))
 ));
 
-gulp.task('watch', () => gulp.watch('src/**/*.js', ['default']));
+gulp.task('watch', () => gulp.watch('src/**/*.js', ['build']));

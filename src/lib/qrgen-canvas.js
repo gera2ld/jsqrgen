@@ -239,19 +239,8 @@ function renderByCanvas(options) {
     var canvasFore = getCanvas(size, size);
     initCanvas(canvasFore, assign({}, common, {data: options.foreground}));
     var ctx = canvasFore.getContext('2d');
-    var fore = ctx.getImageData(0, 0, size, size);
-    var raw = common.context.getImageData(0, 0, size, size);
-    var total = size * size;
-    for (var i = 0; i < total; i ++) {
-      var offset = i * 4;
-      if (raw.data[offset]) {
-        fore.data[offset] = 0;
-        fore.data[offset + 1] = 0;
-        fore.data[offset + 2] = 0;
-        fore.data[offset + 3] = 0;
-      }
-    }
-    ctx.putImageData(fore, 0, 0);
+    ctx.globalCompositeOperation = 'destination-in';
+    ctx.drawImage(common.canvasData, 0, 0);
     return canvasFore;
   }
 
@@ -260,10 +249,8 @@ function renderByCanvas(options) {
     // so that there will not be gaps between cells
     common.cellSize = Math.ceil(options.cellSize);
     var size = common.size = common.cellSize * options.count;
-    var canvasData = getCanvas(size, size);
+    var canvasData = common.canvasData = getCanvas(size, size);
     var contextData = common.context = canvasData.getContext('2d');
-    contextData.fillStyle = colorLight;
-    contextData.fillRect(0, 0, size, size);
     prepareLogo();
     drawCells();
     clearLogo();
