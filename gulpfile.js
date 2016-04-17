@@ -4,6 +4,7 @@ const rename = require('gulp-rename');
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
 const header = require('gulp-header');
+const replace = require('gulp-replace');
 const pkg = require('./package.json');
 const banner = `\
 /**
@@ -18,7 +19,7 @@ const banner = `\
  */
 `;
 
-gulp.task('default', () => (
+gulp.task('build', () => (
   gulp.src('src/lib/*.js')
   .pipe(concat('qrgen.js'))
   .pipe(wrap({src: 'src/exports.js'}))
@@ -30,4 +31,10 @@ gulp.task('default', () => (
   .pipe(gulp.dest('dist/'))
 ));
 
-gulp.task('watch', () => gulp.watch('src/**/*.js', ['default']));
+gulp.task('bower', ['build'], () => (
+  gulp.src('tools/bower/bower.json')
+  .pipe(replace('__VERSION__', pkg.version))
+  .pipe(gulp.dest('.'))
+));
+
+gulp.task('watch', () => gulp.watch('src/**/*.js', ['build']));
