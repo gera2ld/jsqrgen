@@ -1,10 +1,8 @@
+const fs = require('fs');
 const gulp = require('gulp');
 const wrap = require('gulp-wrap');
-const rename = require('gulp-rename');
 const concat = require('gulp-concat');
-const uglify = require('gulp-uglify');
 const header = require('gulp-header');
-const replace = require('gulp-replace');
 const pkg = require('./package.json');
 const banner = `\
 /**
@@ -25,16 +23,14 @@ gulp.task('build', () => (
   .pipe(wrap({src: 'src/exports.js'}))
   .pipe(header(banner, {pkg: pkg}))
   .pipe(gulp.dest('dist/'))
-  .pipe(uglify())
-  .pipe(header(banner, {pkg: pkg}))
-  .pipe(rename({suffix: '.min'}))
-  .pipe(gulp.dest('dist/'))
 ));
 
-gulp.task('bower', ['build'], () => (
-  gulp.src('tools/bower/bower.json')
-  .pipe(replace('__VERSION__', pkg.version))
-  .pipe(gulp.dest('.'))
-));
+gulp.task('bower', ['build'], () => {
+  const bower = require('./bower.json');
+  bower.version = pkg.version;
+  return new Promise((resolve, reject) => {
+    fs.writeFile('./bower.json', JSON.stringify(bower, null, 2), err => err ? reject(err) : resolve());
+  });
+});
 
 gulp.task('watch', () => gulp.watch('src/**/*.js', ['build']));
