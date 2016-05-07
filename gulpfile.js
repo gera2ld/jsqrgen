@@ -25,12 +25,4 @@ gulp.task('build', () => (
   .pipe(gulp.dest('dist/'))
 ));
 
-gulp.task('bower', ['build'], () => {
-  const bower = require('./bower.json');
-  bower.version = pkg.version;
-  return new Promise((resolve, reject) => {
-    fs.writeFile('./bower.json', JSON.stringify(bower, null, 2), err => err ? reject(err) : resolve());
-  });
-});
-
 gulp.task('watch', () => gulp.watch('src/**/*.js', ['build']));

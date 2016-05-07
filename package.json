@@ -8,7 +8,6 @@
   "main": "dist/qrgen.js",
   "scripts": {
     "dev": "gulp build && gulp watch",
-    "version": "gulp bower && git add -A -f dist bower.json",
     "postversion": "sh tools/build-gh.sh"
   },
   "repository": {
