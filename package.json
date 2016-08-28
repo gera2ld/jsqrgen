@@ -7,7 +7,7 @@
   "license": "MIT",
   "main": "dist/qrgen.js",
   "scripts": {
-    "dev": "gulp watch",
+    "dev": "sh scripts/dev.sh",
     "build": "gulp build",
     "version": "sh scripts/version.sh",
     "postversion": "sh scripts/build-gh.sh"
