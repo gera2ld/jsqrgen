@@ -1,80 +1,192 @@
 <!doctype html>
 <html>
-	<head>
-		<title>QRCode</title>
-		<script src="../dist/qrgen.js"></script>
-		<link rel="stylesheet" href="index.css" />
-	</head>
-	<body>
-		<a href="https://github.com/gera2ld/jsqrgen"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
-		<table>
-			<colgroup>
-				<col width=30%>
-				<col>
-			</colgroup>
-			<caption>QRCode Generator</caption>
-			<tr>
-				<td>Text:</td>
-				<td><textarea id="qrtext">http://gerald.top</textarea></td>
-			</tr><tr>
-				<td>Size:</td>
-				<td><input id="cellSize" type=range min=2 max=10 value=6></td>
-			</tr><tr>
-				<td rowspan=2>Effect:</td>
-				<td><input id="cellEffect" type=range min=-50 max=50 step=5 value=0></td>
-			</tr><tr>
-				<td id="cellEffectStops">
-					<div>
-						<div class="left"><a href=# data-key=l>Liquid</a></div>
-						<div class="right"><a href=# data-key=r>Round</a></div>
-						<div class="center"><a href=# data-key=s>Square</a></div>
-					</div>
-				</td>
-			</tr><tr>
-				<td rowspan=4>Colors:</td>
-				<td>Foreground <input id=colorFore type=color value=#4169e1></td>
-			</tr><tr>
-				<td>Background <input id=colorBack type=color value=#ffffff></td>
-			</tr><tr>
-				<td>Outside-border <input id=colorOut type=color value=#cd5c5c></td>
-			</tr><tr>
-				<td>Inside-border <input id=colorIn type=color value=#191970></td>
-			</tr><tr>
-        <td>Minimum type number (1-10):</td>
-        <td><input id=typeNumber type=range min=1 max=10 step=1 value=1></td>
-			</tr><tr>
-				<td colspan=2>
-					<div>
-						<label><input id=cblogo type=checkbox>Add Logo</label>
-						<div id="logoOptions">
-              <span data-type="image">Image</span>
-              <span data-type="text">Text</span>
-						</div>
-					</div>
-				</td>
-			</tr><tr>
-				<td colspan=2 id="logoWrap">
-					<div class="tab" data-type="image">
-						Image: <img id=logoImg src=iloveme.jpg><br>
-						<input id=fimg type=file>
-					</div>
-					<div class="tab" data-type="text">
-						Text: <input id=logoText><br>
-						Font: <input id=logoFont placeholder="CSS font string"><br>
-						Color: <input id=logoColor type=color>
-						<label><input id=logoBold type=checkbox>Bold</label>
-						<label><input id=logoItalic type=checkbox>Italic</label>
-					</div>
-					<div>Size: <input id="logoSize" type=range min=5 max=15 value=15></div>
-          <div>Clear edges: <input id="qrclearedges" type=range min=0 max=2 value=0></div>
-          <div>Margin: <input id="logoMargin" type=range min=0 max=10 value=0></div>
-				</td>
-			</tr><tr>
-				<td><button id=qrgen>Generate</button></td>
-				<td><a target=_blank href=https://github.com/gera2ld/jsqrgen>Visit Github</a></td>
-			</tr>
-		</table>
-		<div id=qrcanvas></div>
-		<script src=index.js></script>
-	</body>
+  <head>
+    <title>QRCode</title>
+    <style>
+      body {
+        background: #eee;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      .panel {
+        display: inline-block;
+        width: 300px;
+        margin-right: 10px;
+        vertical-align: top;
+      }
+      #qrcanvas {
+        display: inline-block;
+        vertical-align: top;
+      }
+      .group {
+        margin-bottom: .4em;
+      }
+      .group > .content {
+        display: block;
+        margin-left: 90px;
+        vertical-align: top;
+      }
+      .group > small {
+        float: left;
+        width: 90px;
+      }
+      .input > * {
+        width: 100%;
+      }
+      .input-labels {
+        text-align-last: justify;
+      }
+      .tabs > * {
+        display: inline-block;
+      }
+      .tab:not(.active) {
+        display: none;
+      }
+      #cblogo:not(:checked) ~ .logo-header {
+        display: none;
+      }
+      .logo-header > * {
+        display: inline-block;
+        padding: .3em;
+        border: 1px solid #aaa;
+        border-bottom: none;
+        background: #eee;
+        color: gray;
+        cursor: pointer;
+      }
+      .logo-header > .active {
+        background: wheat;
+        color: black;
+      }
+      .logo-body {
+        display: block;
+        padding: .4em;
+        border: 1px solid #aaa;
+        background: wheat;
+      }
+      #cblogo:not(:checked) ~ .logo-body {
+        display: none;
+      }
+    </style>
+    <script src="../dist/qrgen.js"></script>
+  </head>
+  <body>
+    <a href="https://github.com/gera2ld/jsqrgen"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+    <h1>QRCode Generator</h1>
+    <div class="panel">
+      <div class="group">
+        <small>Text:</small>
+        <div class="input content">
+          <textarea id="qrtext">https://gerald.top</textarea>
+        </div>
+      </div>
+      <div class="group">
+        <small>Size:</small>
+        <div class="input content">
+          <input id="cellSize" type=range min=2 max=10 value=6>
+        </div>
+      </div>
+      <div class="group">
+        <small>Effect:</small>
+        <div class="input content">
+          <input id="cellEffect" type=range min=-50 max=50 step=5 value=0>
+          <div id="cellEffectStops" class="input-labels">
+            <a href=# data-key=l>Liquid</a>
+            <a href=# data-key=s>Square</a>
+            <a href=# data-key=r>Round</a>
+          </div>
+        </div>
+      </div>
+      <div class="group">
+        <small>Colors:</small>
+        <div class="content">
+          <div class="input group">
+            Foreground
+            <input id=colorFore type=color value=#4169e1>
+          </div>
+          <div class="input group">
+            Background
+            <input id=colorBack type=color value=#ffffff>
+          </div>
+          <div class="input group">
+            Outside-border
+            <input id=colorOut type=color value=#cd5c5c>
+          </div>
+          <div class="input group">
+            Inside-border
+            <input id=colorIn type=color value=#191970>
+          </div>
+        </div>
+      </div>
+      <div class="group">
+        <small>Type number:</small>
+        <div class="input content">
+          <input id=typeNumber type=range min=1 max=10 step=1 value=1>
+        </div>
+      </div>
+      <div class="group tabs">
+        <input id=cblogo type=checkbox>
+        <label for=cblogo>Add Logo</label>
+        <div class="logo-header">
+          <span data-type="image">Image</span>
+          <span data-type="text">Text</span>
+        </div>
+        <div class="logo-body">
+          <div class="tab" data-type="image">
+            <div class="group">
+              <small>Image:</small>
+              <img id=logoImg src=iloveme.jpg>
+              <div class="input content">
+                <input id=fimg type=file>
+              </div>
+            </div>
+          </div>
+          <div class="tab" data-type="text">
+            <div class="group">
+              <small>Text:</small>
+              <div class="input content">
+                <input id=logoText>
+              </div>
+            </div>
+            <div class="group">
+              <small>Font:</small>
+              <div class="input content">
+                <input id=logoFont placeholder="CSS font string">
+              </div>
+            </div>
+            <div class="group">
+              <label>Color: <input id=logoColor type=color></label>
+              <label><input id=logoBold type=checkbox>Bold</label>
+              <label><input id=logoItalic type=checkbox>Italic</label>
+            </div>
+          </div>
+          <div class="group">
+            <small>Size:</small>
+            <div class="input content">
+              <input id="logoSize" type=range min=5 max=20 value=15>
+            </div>
+          </div>
+          <div class="group">
+            <small>Clear edges:</small>
+            <div class="input content">
+              <input id="qrclearedges" type=range min=0 max=2 value=0>
+            </div>
+          </div>
+          <div class="group">
+            <small>Margin:</small>
+            <div class="input content">
+              <input id="logoMargin" type=range min=0 max=10 value=0>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="group">
+        <button id=qrgen>Make</button>
+        <a target=_blank href="https://github.com/gera2ld/jsqrgen/wiki">Wiki</a>
+      </div>
+    </div>
+    <div id=qrcanvas></div>
+    <script src=index.js></script>
+  </body>
 </html>

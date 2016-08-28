@@ -7,8 +7,9 @@
   "license": "MIT",
   "main": "dist/qrgen.js",
   "scripts": {
-    "dev": "gulp build && gulp watch",
-    "postversion": "sh tools/build-gh.sh"
+    "dev": "gulp watch",
+    "build": "gulp build",
+    "postversion": "sh scripts/build-gh.sh"
   },
   "repository": {
     "type": "git",

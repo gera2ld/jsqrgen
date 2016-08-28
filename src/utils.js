@@ -31,7 +31,7 @@ function initCanvas(canvas, options) {
   if (!data) return;
   if (typeof data == 'string') data = [{style: data}];
   // color blocks
-  if (Array.isArray(data))
+  if (Array.isArray(data)) {
     forEach(data, function (block) {
       var x, y, w, h, s;
       block = block || {};
@@ -45,22 +45,22 @@ function initCanvas(canvas, options) {
       ctx.fillStyle = s;
       ctx.fillRect(x, y, w, h);
     });
+  }
   // image
-  else
+  else {
     ctx.drawImage(data, 0, 0, canvas.width, canvas.height);
+  }
 }
 
 function forEach(arr, cb) {
-  for (var i = 0; i < arr.length; i ++)
-    cb.call(arr, arr[i], i);
+  for (var i = 0; i < arr.length; i ++) cb.call(arr, arr[i], i);
 }
 
 function assign() {
   var obj;
   forEach(arguments, function (arg) {
     if (!obj) obj = arg;
-    else if (arg)
-      for(var key in arg) obj[key] = arg[key];
+    else if (arg) for(var key in arg) obj[key] = arg[key];
   });
   return obj;
 }

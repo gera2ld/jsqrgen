@@ -1,9 +1,8 @@
 DEMO_DIR=gh-pages
 rm -rf $DEMO_DIR
-cp -R tools/static $DEMO_DIR
 cp -R demo $DEMO_DIR
-mkdir $DEMO_DIR/dist
-cp dist/qrgen.js $DEMO_DIR/dist
+npm run build
+cp dist/qrgen.js $DEMO_DIR
 cd $DEMO_DIR
 git init
 git add .

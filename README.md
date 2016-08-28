@@ -13,6 +13,6 @@ The only requirement is that the browser works with a `canvas`, which is support
 
 More
 ---
-* [Demo](http://gera2ld.github.io/jsqrgen/demo/)
+* [Demo](https://gera2ld.github.io/jsqrgen/)
 * [Wiki](https://github.com/gera2ld/jsqrgen/wiki)
 * [中文文档](https://gerald.top/code/qrgen)
