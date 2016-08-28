@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "gulp watch",
     "build": "gulp build",
+    "version": "sh scripts/version.sh",
     "postversion": "sh scripts/build-gh.sh"
   },
   "repository": {
