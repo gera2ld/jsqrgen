@@ -1,34 +1,34 @@
-(function ($) {
+!function () {
   !function () {
-    function shimDataset() {
-      // IE 10- does not support dataset
-      var datasets = [];
-      Object.defineProperty(HTMLElement.prototype, 'dataset', {
-        get: function () {
-          var dataset, ele = this;
-          forEach(datasets, function (item) {
-            if (item.ele === ele) {
-              dataset = item.dataset;
-              return false;
-            }
-          });
-          if (!dataset) {
-            dataset = {};
-            datasets.push({ele: ele, dataset: dataset});
-            forEach(ele.attributes, function (attr) {
-              var name = attr.name;
-              if (/^data-/.test(name)) {
-                name = name.slice(5).replace(/-(\w)/g, function (m, g) {
-                  return g.toUpperCase();
-                });
-                dataset[name] = attr.value;
-              }
-            });
-          }
-          return dataset;
-        },
-      });
-    }
+    // function shimDataset() {
+    //   // IE 10- does not support dataset
+    //   var datasets = [];
+    //   Object.defineProperty(HTMLElement.prototype, 'dataset', {
+    //     get: function () {
+    //       var dataset, ele = this;
+    //       forEach(datasets, function (item) {
+    //         if (item.ele === ele) {
+    //           dataset = item.dataset;
+    //           return false;
+    //         }
+    //       });
+    //       if (!dataset) {
+    //         dataset = {};
+    //         datasets.push({ele: ele, dataset: dataset});
+    //         forEach(ele.attributes, function (attr) {
+    //           var name = attr.name;
+    //           if (/^data-/.test(name)) {
+    //             name = name.slice(5).replace(/-(\w)/g, function (m, g) {
+    //               return g.toUpperCase();
+    //             });
+    //             dataset[name] = attr.value;
+    //           }
+    //         });
+    //       }
+    //       return dataset;
+    //     },
+    //   });
+    // }
     function shimClassList() {
       // IE 9- does not support classList
       function ClassList(ele) {
@@ -74,47 +74,35 @@
         },
       });
     }
-    if (!document.body.dataset) shimDataset();
+    // if (!document.body.dataset) shimDataset();
     if (!document.body.classList) shimClassList();
   }();
 
+  function $(selector) {
+    return document.querySelector(selector);
+  }
   function forEach(arr, cb) {
     for (var i = 0; i < arr.length; i ++)
       if (cb.call(arr, arr[i], i) === false) break;
   }
-  function updateLogoTab() {
-    forEach(logoTabs, function (ele) {
-      ele.classList[ele.dataset.type === logoTab.type ? 'remove' : 'add']('hide');
+  function setLogoType(el) {
+    if (logoTab.head) logoTab.head.classList.remove('active');
+    logoTab.head = el;
+    logoTab.type = el.getAttribute('data-type');
+    el.classList.add('active');
+    forEach(logoTabs, function (el) {
+      el.classList[el.getAttribute('data-type') === logoTab.type ? 'add' : 'remove']('active');
     });
   }
-  function toggleLogo() {
-    if (cbLogo.checked) {
-      logoWrap.classList.remove('hide');
-      logoOptions.classList.remove('hide');
-      updateLogoTab();
-    } else {
-      logoWrap.classList.add('hide');
-      logoOptions.classList.add('hide');
-    }
-  }
-  function updateLogoType(ele) {
-    if (logoTab.head) logoTab.head.classList.remove('active');
-    logoTab.head = ele;
-    logoTab.type = ele.dataset.type;
-    ele.classList.add('active');
-    updateLogoTab();
-  }
 
-  var logoWrap = $('#logoWrap');
-  var logoTabs = logoWrap.querySelectorAll('.tab');
-  var logoOptions = $('#logoOptions');
+  var logoTabs = document.querySelectorAll('.logo-body>.tab');
+  var logoHeader = $('.logo-header');
   var cbLogo = $('#cblogo');
   var logoImg = $('#logoImg');
   var logoTab = {};
-  updateLogoType($('#logoOptions>[data-type]'));
-  cbLogo.onchange = toggleLogo;
+  setLogoType($('.logo-header>[data-type]'));
   $('#cellEffectStops').addEventListener('click', function (e) {
-    var d = e.target.dataset.key;
+    var d = e.target.getAttribute('data-key');
     if (d) {
       e.preventDefault();
       switch (d) {
@@ -130,11 +118,10 @@
       }
     }
   }, false);
-  logoOptions.addEventListener('click', function (e) {
-    var type = e.target.dataset.type;
-    if (type) updateLogoType(e.target);
+  logoHeader.addEventListener('click', function (e) {
+    var type = e.target.getAttribute('data-type');
+    if (type) setLogoType(e.target);
   }, false);
-  toggleLogo();
 
   $('#fimg').addEventListener('change', function (e) {
     var reader = new FileReader;
@@ -199,4 +186,4 @@
     canvas = qrgen.canvas(options);
     q.appendChild(canvas);
   };
-})(document.querySelector.bind(document));
+}();

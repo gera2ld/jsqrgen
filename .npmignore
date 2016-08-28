@@ -1,5 +1,6 @@
 demo
 src
 gh-pages
-tools
+scripts
 gulpfile.js
+*.log

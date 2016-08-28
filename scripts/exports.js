@@ -5,9 +5,9 @@
     root.qrgen = factory(root);
 }(typeof window !== 'undefined' ? window : this, function (window) {
 
-  <%=contents%>
+  <%= contents %>
 
   return {
-    canvas: QRCanvas,
+    canvas: qrcanvas,
   };
 });

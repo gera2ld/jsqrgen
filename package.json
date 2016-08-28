@@ -7,9 +7,10 @@
   "license": "MIT",
   "main": "dist/qrgen.js",
   "scripts": {
-    "dev": "gulp build && gulp watch",
-    "version": "gulp bower && git add -A -f dist bower.json",
-    "postversion": "sh tools/build-gh.sh"
+    "dev": "gulp watch",
+    "build": "gulp build",
+    "version": "sh scripts/version.sh",
+    "postversion": "sh scripts/build-gh.sh"
   },
   "repository": {
     "type": "git",
@@ -22,9 +23,6 @@
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
     "gulp-header": "^1.7.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-replace": "^0.5.4",
-    "gulp-uglify": "^1.4.1",
     "gulp-wrap": "^0.11.0"
   }
 }
