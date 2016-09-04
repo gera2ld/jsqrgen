@@ -16,3 +16,7 @@ More
 * [Demo](https://gera2ld.github.io/jsqrgen/)
 * [Wiki](https://github.com/gera2ld/jsqrgen/wiki)
 * [中文文档](https://gerald.top/code/qrgen)
+* Use with other frameworks:
+
+  * Vue.js: [jsqrgen-vue](https://github.com/gera2ld/jsqrgen-vue)
+  * ReactJS: [jsqrgen-react](https://github.com/gera2ld/jsqrgen-react)
