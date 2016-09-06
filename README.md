@@ -20,3 +20,10 @@ More
 
   * Vue.js: [jsqrgen-vue](https://github.com/gera2ld/jsqrgen-vue)
   * ReactJS: [jsqrgen-react](https://github.com/gera2ld/jsqrgen-react)
+
+Snapshots
+---
+
+![1](snapshots/1.png)
+
+![2](snapshots/2.png)
