@@ -31,31 +31,33 @@
     // }
     function shimClassList() {
       // IE 9- does not support classList
-      function ClassList(ele) {
-        this.ele = ele;
-        this.add = this._add.bind(this);
-        this.remove = this._remove.bind(this);
+      function getClassList(el) {
+        function get() {
+          return el.className.trim().split(/\s+/);
+        }
+        function set(list) {
+          el.className = list.join(' ');
+        }
+        function add() {
+          var list = get();
+          forEach(arguments, function (arg) {
+            list.indexOf(arg) < 0 && list.push(arg);
+          });
+          set(list);
+        }
+        function remove() {
+          var list = get();
+          forEach(arguments, function (arg) {
+            var i = list.indexOf(arg);
+            if (~i) list.splice(i, 1);
+          });
+          set(list);
+        }
+        return {
+          add: add,
+          remove: remove,
+        };
       }
-      ClassList.prototype = {
-        _get: function () {
-          return this.ele.className.trim().split(/\s+/);
-        },
-        _set: function (list) {
-          this.ele.className = list.join(' ');
-        },
-        _add: function (cls) {
-          var list = this._get();
-          var i = list.indexOf(cls);
-          if (i < 0) list.push(cls);
-          this._set(list);
-        },
-        _remove: function (cls) {
-          var list = this._get();
-          var i = list.indexOf(cls);
-          if (~i) list.splice(i, 1);
-          this._set(list);
-        },
-      };
       var classLists = [];
       Object.defineProperty(HTMLElement.prototype, 'classList', {
         get: function () {
@@ -67,7 +69,7 @@
             }
           });
           if (!classList) {
-            classList = new ClassList(ele);
+            classList = getClassList(ele);
             classLists.push({ele: ele, classList: classList});
           }
           return classList;
@@ -94,48 +96,37 @@
       el.classList[el.getAttribute('data-type') === logoTab.type ? 'add' : 'remove']('active');
     });
   }
+  function showImage(img, file) {
+    if (!file) return;
+    var reader = new FileReader;
+    reader.onload = function () {
+      img.src = this.result;
+    };
+    reader.readAsDataURL(file);
+  }
 
   var logoTabs = document.querySelectorAll('.logo-body>.tab');
   var logoHeader = $('.logo-header');
   var cbLogo = $('#cblogo');
   var logoImg = $('#logoImg');
+  var effectImg = $('#effect-img');
   var logoTab = {};
   setLogoType($('.logo-header>[data-type]'));
-  $('#cellEffectStops').addEventListener('click', function (e) {
-    var d = e.target.getAttribute('data-key');
-    if (d) {
-      e.preventDefault();
-      switch (d) {
-        case 's':
-          t.value = 0;
-          break;
-        case 'l':
-          t.value = -50;
-          break;
-        case 'r':
-          t.value = 50;
-          break;
-      }
-    }
-  }, false);
   logoHeader.addEventListener('click', function (e) {
     var type = e.target.getAttribute('data-type');
     if (type) setLogoType(e.target);
   }, false);
 
   $('#fimg').addEventListener('change', function (e) {
-    var reader = new FileReader;
-    reader.onload = function () {
-      logoImg.src = this.result;
-    };
-    reader.readAsDataURL(e.target.files[0]);
+    showImage(logoImg, e.target.files[0]);
+  }, false);
+  $('#effect-file').addEventListener('change', function (e) {
+    showImage(effectImg, e.target.files[0]);
   }, false);
 
   var q = $('#qrcanvas');
-  var t = $('#cellEffect');
   var canvas;
   $('#qrgen').onclick = function () {
-    var s = t.value / 100;
     var colorIn = $('#colorIn').value;
     var colorOut = $('#colorOut').value;
     var colorFore = $('#colorFore').value;
@@ -178,10 +169,13 @@
         options.logo.fontStyle = style;
       }
     }
-    if (s >= 0)
-      options.effect = {key: 'round', value: s};
-    else
-      options.effect = {key: 'liquid', value: -s};
+    var effect = $('[name=effect-type]:checked').value;
+    if (effect !== 'none') {
+      options.effect = {key: effect, value: $('#effect-value').value / 100};
+      if (effect === 'image') {
+        options.background = [colorBack, effectImg];
+      }
+    }
     options.reuseCanvas = canvas;
     canvas = qrgen.canvas(options);
     q.appendChild(canvas);

@@ -47,7 +47,7 @@ QRCanvas.prototype.m_init = function (options) {
     // - {key: 'image', value: 0-1}
     effect: {},
 
-    // Remove alpha channel to make the image not transparent
+    // Avoid transparent pixels
     noAlpha: true,
 
     // Null or a canvas to be reused

@@ -1,3 +1,3 @@
 mkdir dist 2>/dev/null
-cp demo/* dist
+cp scripts/demo/* dist
 gulp watch
