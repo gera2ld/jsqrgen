@@ -41,10 +41,13 @@ QRCanvas.prototype.m_init = function (options) {
     // data MUST be a string
     data: '',
 
-    // effect: {key: [round|liquid], value: 0-0.5}
+    // effect: an object with optional key and value
+    // - {key: 'round', value: 0-1}
+    // - {key: 'liquid', value: 0-1}
+    // - {key: 'image', value: 0-1}
     effect: {},
 
-    // Remove alpha channel to make the image not transparent
+    // Avoid transparent pixels
     noAlpha: true,
 
     // Null or a canvas to be reused
@@ -82,10 +85,12 @@ QRCanvas.prototype.m_init = function (options) {
   };
   var optionLogo = options.logo;
   optionLogo && (optionLogo.image || optionLogo.text) && assign(logo, optionLogo);
-  // if a logo is to be added, correctLevel is set to H
   if (logo.image || logo.text) {
-    options.correctLevel = 'H';
     if (logo.margin < 0) logo.margin = logo.image ? 0 : 2;
+  }
+
+  if (logo.image || logo.text || options.effect.key === 'image') {
+    options.correctLevel = 'H';
   }
 
   // Generate QRCode data with qrcode-light.js
@@ -118,38 +123,67 @@ QRCanvas.prototype.m_isDark = function (i, j) {
 QRCanvas.prototype.m_draw = function () {
   var _this = this;
   var options = _this.m_options;
+  var count = _this.m_count;
   // ensure size and cellSize are integers
   // so that there will not be gaps between cells
   var cellSize = Math.ceil(_this.m_cellSize);
-  var size = cellSize * _this.m_count;
+  var size = cellSize * count;
   var canvasData = getCanvas(size, size);
 
   _this.m_initLogo(canvasData);
-  _this.m_drawCells(canvasData, cellSize);
+  _this.m_drawCells(canvasData, {
+    cellSize: cellSize,
+    count: count,
+    effect: options.effect,
+  });
   _this.m_clearLogo(canvasData);
 
-  var canvasFore = getCanvas(size, size);
-  initCanvas(canvasFore, assign({
+  var foreground;
+  if (options.effect.key === 'image') {
+    var foremask = initCanvas(getCanvas(size, size), {
+      cellSize: cellSize,
+      size: size,
+    });
+    // draw foremask without effects
+    _this.m_drawCells(foremask, {
+      cellSize: cellSize,
+      count: count,
+    });
+    foreground = initCanvas(getCanvas(size, size), {
+      cellSize: cellSize,
+      size: size,
+      data: options.foreground,
+    });
+    var contextFore = foreground.getContext('2d');
+    contextFore.globalCompositeOperation = 'destination-in';
+    contextFore.drawImage(foremask, 0, 0);
+    contextFore.globalCompositeOperation = 'destination-over';
+    contextFore.fillStyle = QRCanvas.m_colorLight;
+    contextFore.fillRect(0, 0, size, size);
+  } else {
+    foreground = options.foreground;
+  }
+  var canvasFore = initCanvas(getCanvas(size, size), assign({
     cellSize: cellSize,
     size: size,
-    data: options.foreground,
+    data: foreground,
   }));
   var contextFore = canvasFore.getContext('2d');
   contextFore.globalCompositeOperation = 'destination-in';
   contextFore.drawImage(canvasData, 0, 0);
 
-  var canvas = getCanvas(size, size);
-  initCanvas(canvas, {
+  var background = options.background;
+  if (options.noAlpha) background = merge(QRCanvas.m_colorLight, background);
+  var canvas = initCanvas(getCanvas(size, size), {
     cellSize: cellSize,
     size: size,
-    data: options.background,
+    data: background,
   });
   var context = canvas.getContext('2d');
   context.drawImage(canvasFore, 0, 0);
 
   var logo = _this.m_logo;
   if (logo.canvas) context.drawImage(logo.canvas, logo.x, logo.y);
-  options.noAlpha && _this.m_transformAlpha(context);
 
   var destSize = _this.m_size;
   var canvasTarget = options.reuseCanvas;
@@ -229,54 +263,38 @@ QRCanvas.prototype.m_initLogo = function (canvas) {
   }
   _this.m_detectEdges();
 };
-QRCanvas.prototype.m_drawCells = function (canvas, cellSize) {
+QRCanvas.prototype.m_drawCells = function (canvas, options) {
   var _this = this;
-  var count = _this.m_count;
-  var effect = _this.m_options.effect;
-  var options = {
+  var cellSize = options.cellSize;
+  var count = options.count;
+  var effect = options.effect || {};
+  var cellOptions = {
+    cellSize: cellSize,
+    count: count,
     context: canvas.getContext('2d'),
-    effect: effect.value * cellSize,
+    value: effect.value || 0,
   };
   // draw qrcode according to effect
   var drawCell = QRCanvas.m_effects[effect.key] || _this.m_drawSquare;
   // draw cells
   for (var i = 0; i < count; i ++) {
     for (var j = 0; j < count; j ++) {
-      drawCell.call(_this, assign({
+      drawCell.call(_this, {
         i: i,
         j: j,
         x: j * cellSize,
         y: i * cellSize,
-      }, options));
+      }, cellOptions);
     }
   }
 };
-QRCanvas.prototype.m_drawSquare = function (cell) {
-  var _this = this;
-  var context = cell.context;
-  var cellSize = _this.m_cellSize;
-  if (_this.m_isDark(cell.i, cell.j)) {
+QRCanvas.prototype.m_drawSquare = function (cell, options) {
+  var context = options.context;
+  var cellSize = options.cellSize;
+  if (this.m_isDark(cell.i, cell.j)) {
     context.fillStyle = QRCanvas.m_colorDark;
     context.fillRect(cell.x, cell.y, cellSize, cellSize);
   }
-};
-QRCanvas.prototype.m_transformAlpha = function (context) {
-  var _this = this;
-  var size = _this.m_size;
-  var imageData = context.getImageData(0, 0, size, size);
-  var total = size * size;
-  var transformColor = _this.m_transformColor;
-  for (var i = 0; i < total; i ++) {
-    var offset = i * 4;
-    var alpha = imageData.data[offset + 3];
-    if (alpha < 255) {
-      imageData.data[offset] = transformColor(imageData.data[offset], 255, alpha);
-      imageData.data[offset + 1] = transformColor(imageData.data[offset + 1], 255, alpha);
-      imageData.data[offset + 2] = transformColor(imageData.data[offset + 2], 255, alpha);
-      imageData.data[offset + 3] = 255;
-    }
-  }
-  context.putImageData(imageData, 0, 0);
 };
 /**
  * @desc Transform color to remove alpha channel

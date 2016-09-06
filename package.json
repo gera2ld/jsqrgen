@@ -3,14 +3,14 @@
   "version": "2.0.8",
   "title": "JSQRGen",
   "description": "Generate characteristic qrcodes with a canvas.",
-  "author": "Gerald <gera2ld@163.com>",
+  "author": "Gerald <i@gerald.top>",
   "license": "MIT",
   "main": "dist/qrgen.js",
   "scripts": {
-    "dev": "gulp watch",
+    "dev": "sh scripts/dev.sh",
     "build": "gulp build",
     "version": "sh scripts/version.sh",
-    "postversion": "sh scripts/build-gh.sh"
+    "deploy": "sh scripts/build-gh.sh"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
     "gulp-header": "^1.7.1",
+    "gulp-uglify": "^2.0.0",
     "gulp-wrap": "^0.11.0"
   }
 }

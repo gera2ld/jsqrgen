@@ -1,2 +1,2 @@
-npm run build
+npm run build --production
 git add dist/qrgen.js

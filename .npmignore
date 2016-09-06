@@ -1,6 +1,6 @@
-demo
 src
 gh-pages
 scripts
 gulpfile.js
+snapshots
 *.log
