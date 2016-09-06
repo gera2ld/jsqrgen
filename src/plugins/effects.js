@@ -95,7 +95,7 @@
       || i <= 7 && count - j - 1 <= 7
       || count - i - 1 <= 7 && j <= 7
       || i + 5 <= count && i + 9 >= count && j + 5 <= count && j + 9 >= count
-      || i === 7 || j === 7) fillSize = .9 + .1 * options.value;
+      || i === 7 || j === 7) fillSize = 1 - .1 * options.value;
     var offset = (1 - fillSize) / 2;
     context.fillRect(x + offset * cellSize, y + offset * cellSize, fillSize * cellSize, fillSize * cellSize);
   }
