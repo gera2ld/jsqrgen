@@ -13,13 +13,13 @@
     }
   }
 
-  function drawRound(cell) {
+  function drawRound(cell, options) {
     var _this = this;
-    var cellSize = _this.m_cellSize;
     var x = cell.x;
     var y = cell.y;
-    var effect = cell.effect;
-    var context = cell.context;
+    var cellSize = options.cellSize;
+    var effect = options.value * cellSize / 2;
+    var context = options.context;
     // draw cell if it should be dark
     if(_this.m_isDark(cell.i, cell.j)) {
       context.fillStyle = QRCanvas.m_colorDark;
@@ -44,16 +44,16 @@
     context.fill();
   }
 
-  function drawLiquid(cell) {
+  function drawLiquid(cell, options) {
     var _this = this;
     var corners = [0, 0, 0, 0]; // NW, NE, SE, SW
     var i = cell.i;
     var j = cell.j;
     var x = cell.x;
     var y = cell.y;
-    var context = cell.context;
-    var effect = cell.effect;
-    var cellSize = _this.m_cellSize;
+    var cellSize = options.cellSize;
+    var effect = options.value * cellSize / 2;
+    var context = options.context;
     if(_this.m_isDark(i-1, j)) {corners[0] ++; corners[1] ++;}
     if(_this.m_isDark(i+1, j)) {corners[2] ++; corners[3] ++;}
     if(_this.m_isDark(i, j-1)) {corners[0] ++; corners[3] ++;}
@@ -81,8 +81,28 @@
     }
   }
 
+  function drawImage(cell, options) {
+    var i = cell.i;
+    var j = cell.j;
+    var x = cell.x;
+    var y = cell.y;
+    var context = options.context;
+    var cellSize = options.cellSize;
+    var count = options.count;
+    context.fillStyle = QRCanvas.m_colorDark;
+    var fillSize = .25;
+    if (i <= 7 && j <= 7
+      || i <= 7 && count - j - 1 <= 7
+      || count - i - 1 <= 7 && j <= 7
+      || i + 5 <= count && i + 9 >= count && j + 5 <= count && j + 9 >= count
+      || i === 7 || j === 7) fillSize = .9 + .1 * options.value;
+    var offset = (1 - fillSize) / 2;
+    context.fillRect(x + offset * cellSize, y + offset * cellSize, fillSize * cellSize, fillSize * cellSize);
+  }
+
   assign(QRCanvas.m_effects, {
     round: drawRound,
     liquid: drawLiquid,
+    image: drawImage,
   });
 }();
