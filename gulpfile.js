@@ -4,6 +4,7 @@ const wrap = require('gulp-wrap');
 const concat = require('gulp-concat');
 const header = require('gulp-header');
 const uglify = require('gulp-uglify');
+const eslint = require('gulp-eslint');
 const pkg = require('./package.json');
 const isProd = process.env.NODE_ENV === 'production';
 const banner = `\
@@ -28,8 +29,29 @@ gulp.task('build', () => {
   stream = stream
   .pipe(header(banner, {pkg: pkg}))
   .pipe(gulp.dest('dist/'));
+  return stream;
 });
 
-gulp.task('watch', ['build'], () => {
-  return gulp.watch('src/**/*.js', ['build']);
+gulp.task('demo', () => {
+  return gulp.src('scripts/demo/**')
+    .pipe(gulp.dest('dist/'));
+});
+
+gulp.task('default', ['build', 'demo']);
+
+gulp.task('lint', () => {
+  return gulp.src([
+    'src/**/*.js',
+    '!src/qrcode-light.js',
+  ])
+  .pipe(concat(`qrgen-lint.js`))
+  .pipe(gulp.dest('dist/'))
+  .pipe(eslint())
+  .pipe(eslint.format())
+  .pipe(eslint.failAfterError());
+});
+
+gulp.task('watch', ['default'], () => {
+  gulp.watch('src/**/*.js', ['build']);
+  gulp.watch('scripts/demo/**', ['demo']);
 });

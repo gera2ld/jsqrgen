@@ -1,0 +1,32 @@
+rules:
+  indent:
+    - 2
+    - 2
+  quotes:
+    - 2
+    - single
+  linebreak-style:
+    - 2
+    - unix
+  semi:
+    - 2
+    - always
+  comma-dangle:
+    - 0
+  no-console:
+    - 2
+    - allow:
+      - warn
+      - error
+  no-unused-vars:
+    - 2
+    - args: all
+      argsIgnorePattern: ^_
+
+env:
+  browser: true
+
+globals:
+  qrcode: true
+
+extends: 'eslint:recommended'

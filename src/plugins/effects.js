@@ -1,7 +1,5 @@
 /**
 * @desc rendering functions for each cell
-* - drawRound
-* - drawLiquid
 */
 !function () {
   function drawCorner(context, cornerX, cornerY, x, y, r) {
@@ -14,14 +12,13 @@
   }
 
   function drawRound(cell, options) {
-    var _this = this;
     var x = cell.x;
     var y = cell.y;
     var cellSize = options.cellSize;
     var effect = options.value * cellSize / 2;
     var context = options.context;
     // draw cell if it should be dark
-    if(_this.m_isDark(cell.i, cell.j)) {
+    if(options.isDark(cell.i, cell.j)) {
       context.fillStyle = QRCanvas.m_colorDark;
       context.beginPath();
       context.moveTo(x + .5 * cellSize, y);
@@ -45,7 +42,6 @@
   }
 
   function drawLiquid(cell, options) {
-    var _this = this;
     var corners = [0, 0, 0, 0]; // NW, NE, SE, SW
     var i = cell.i;
     var j = cell.j;
@@ -54,17 +50,17 @@
     var cellSize = options.cellSize;
     var effect = options.value * cellSize / 2;
     var context = options.context;
-    if(_this.m_isDark(i-1, j)) {corners[0] ++; corners[1] ++;}
-    if(_this.m_isDark(i+1, j)) {corners[2] ++; corners[3] ++;}
-    if(_this.m_isDark(i, j-1)) {corners[0] ++; corners[3] ++;}
-    if(_this.m_isDark(i, j+1)) {corners[1] ++; corners[2] ++;}
+    if(options.isDark(i-1, j)) {corners[0] ++; corners[1] ++;}
+    if(options.isDark(i+1, j)) {corners[2] ++; corners[3] ++;}
+    if(options.isDark(i, j-1)) {corners[0] ++; corners[3] ++;}
+    if(options.isDark(i, j+1)) {corners[1] ++; corners[2] ++;}
     // draw cell
     context.fillStyle = QRCanvas.m_colorDark;
-    if(_this.m_isDark(i, j)) {
-      if(_this.m_isDark(i-1, j-1)) corners[0] ++;
-      if(_this.m_isDark(i-1, j+1)) corners[1] ++;
-      if(_this.m_isDark(i+1, j+1)) corners[2] ++;
-      if(_this.m_isDark(i+1, j-1)) corners[3] ++;
+    if(options.isDark(i, j)) {
+      if(options.isDark(i-1, j-1)) corners[0] ++;
+      if(options.isDark(i-1, j+1)) corners[1] ++;
+      if(options.isDark(i+1, j+1)) corners[2] ++;
+      if(options.isDark(i+1, j-1)) corners[3] ++;
       context.beginPath();
       context.moveTo(x + .5 * cellSize, y);
       drawCorner(context, x + cellSize, y, x + cellSize, y + .5 * cellSize, corners[1] ? 0 : effect);
@@ -100,9 +96,27 @@
     context.fillRect(x + offset * cellSize, y + offset * cellSize, fillSize * cellSize, fillSize * cellSize);
   }
 
+  function drawImageFore(options) {
+    var cellSize = options.cellSize;
+    var size = options.size;
+    var mask = options.mask();
+    var foreground = drawCanvas(getCanvas(size, size), {
+      cellSize: cellSize,
+      size: size,
+      data: options.foreground,
+    });
+    var ctx = foreground.getContext('2d');
+    ctx.globalCompositeOperation = 'destination-in';
+    ctx.drawImage(mask, 0, 0);
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.fillStyle = QRCanvas.m_colorLight;
+    ctx.fillRect(0, 0, size, size);
+    return foreground;
+  }
+
   assign(QRCanvas.m_effects, {
-    round: drawRound,
-    liquid: drawLiquid,
-    image: drawImage,
+    round: {data: drawRound},
+    liquid: {data: drawLiquid},
+    image: {data: drawImage, foreground: drawImageFore},
   });
 }();
