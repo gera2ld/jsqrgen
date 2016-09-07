@@ -1,8 +1,7 @@
-DEMO_DIR=gh-pages
+DEMO_DIR=dist
 rm -rf $DEMO_DIR
-cp -R scripts/demo $DEMO_DIR
-npm run build --production
-cp dist/qrgen.js $DEMO_DIR
+npm run lint
+npm run gulp --production
 cd $DEMO_DIR
 git init
 git add .

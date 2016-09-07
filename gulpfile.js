@@ -28,8 +28,17 @@ gulp.task('build', () => {
   stream = stream
   .pipe(header(banner, {pkg: pkg}))
   .pipe(gulp.dest('dist/'));
+  return stream;
 });
 
-gulp.task('watch', ['build'], () => {
-  return gulp.watch('src/**/*.js', ['build']);
+gulp.task('demo', () => {
+  return gulp.src('scripts/demo/**')
+    .pipe(gulp.dest('dist/'));
+});
+
+gulp.task('default', ['build', 'demo']);
+
+gulp.task('watch', ['default'], () => {
+  gulp.watch('src/**/*.js', ['build']);
+  gulp.watch('scripts/demo/**', ['demo']);
 });
