@@ -1,10 +1,4 @@
 /**
- * Common functions for JSQRGen
- * @author Gerald <gera2ld@163.com>
- * @license MIT
- */
-
-/**
  * @desc Create a new canvas.
  * @param {Int} width Width of the canvas.
  * @param {Int} height Height of the canvas.
@@ -18,17 +12,17 @@ function getCanvas(width, height) {
 }
 
 /**
- * @desc Initialize the canvas with given image or colors.
+ * @desc Draw to the canvas with given image or colors.
  * @param {Canvas} canvas The canvas to initialize.
  * @param {Object} options
  *    data: {Image} or {String} or {Array}
  *    size: {Int}
  *    cellSize: {Int}
  */
-function initCanvas(canvas, options) {
-  var ctx = canvas.getContext('2d');
+function drawCanvas(canvas, options) {
   var data = options.data;
   if (data) {
+    var ctx = canvas.getContext('2d');
     if (!Array.isArray(data)) data = [data];
     forEach(data, function (item) {
       if (item instanceof HTMLElement) {
@@ -52,7 +46,8 @@ function initCanvas(canvas, options) {
 }
 
 function forEach(arr, cb) {
-  for (var i = 0; i < arr.length; i ++) cb.call(arr, arr[i], i);
+  var length = arr && arr.length || 0;
+  for (var i = 0; i < length; i ++) cb.call(arr, arr[i], i);
 }
 
 function assign() {

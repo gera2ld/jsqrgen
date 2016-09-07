@@ -9,7 +9,21 @@ function QRCanvas(options) {
 }
 
 // rendering functions
-QRCanvas.m_effects = {};
+QRCanvas.m_effects = {
+  square: {
+    data: function (cell, options) {
+      var context = options.context;
+      var cellSize = options.cellSize;
+      if (options.isDark(cell.i, cell.j)) {
+        context.fillStyle = QRCanvas.m_colorDark;
+        context.fillRect(cell.x, cell.y, cellSize, cellSize);
+      }
+    },
+  },
+};
+QRCanvas.m_getEffect = function (key) {
+  return QRCanvas.m_effects[key] || QRCanvas.m_effects.square;
+};
 QRCanvas.m_colorDark = 'black';
 QRCanvas.m_colorLight = 'white';
 
@@ -129,61 +143,35 @@ QRCanvas.prototype.m_draw = function () {
   var cellSize = Math.ceil(_this.m_cellSize);
   var size = cellSize * count;
   var canvasData = getCanvas(size, size);
-
-  _this.m_initLogo(canvasData);
-  _this.m_drawCells(canvasData, {
-    cellSize: cellSize,
-    count: count,
-    effect: options.effect,
-  });
-  _this.m_clearLogo(canvasData);
-
-  var foreground;
-  if (options.effect.key === 'image') {
-    var foremask = initCanvas(getCanvas(size, size), {
-      cellSize: cellSize,
-      size: size,
-    });
-    // draw foremask without effects
-    _this.m_drawCells(foremask, {
-      cellSize: cellSize,
-      count: count,
-    });
-    foreground = initCanvas(getCanvas(size, size), {
-      cellSize: cellSize,
-      size: size,
-      data: options.foreground,
-    });
-    var contextFore = foreground.getContext('2d');
-    contextFore.globalCompositeOperation = 'destination-in';
-    contextFore.drawImage(foremask, 0, 0);
-    contextFore.globalCompositeOperation = 'destination-over';
-    contextFore.fillStyle = QRCanvas.m_colorLight;
-    contextFore.fillRect(0, 0, size, size);
-  } else {
-    foreground = options.foreground;
-  }
-  var canvasFore = initCanvas(getCanvas(size, size), assign({
+  var optionsDraw = {
     cellSize: cellSize,
     size: size,
-    data: foreground,
-  }));
-  var contextFore = canvasFore.getContext('2d');
+    count: count,
+    effect: options.effect,
+    foreground: options.foreground,
+  };
+
+  _this.m_initLogo(canvasData);
+  _this.m_drawCells(canvasData, optionsDraw);
+  _this.m_clearLogo(canvasData);
+
+  var foreground = _this.m_drawForeground(optionsDraw);
+  var contextFore = foreground.getContext('2d');
   contextFore.globalCompositeOperation = 'destination-in';
   contextFore.drawImage(canvasData, 0, 0);
 
-  var background = options.background;
-  if (options.noAlpha) background = merge(QRCanvas.m_colorLight, background);
-  var canvas = initCanvas(getCanvas(size, size), {
+  var canvas = drawCanvas(getCanvas(size, size), {
     cellSize: cellSize,
     size: size,
-    data: background,
+    data: merge(
+      options.noAlpha ? QRCanvas.m_colorLight : null,
+      options.background,
+      foreground
+    ),
   });
-  var context = canvas.getContext('2d');
-  context.drawImage(canvasFore, 0, 0);
 
   var logo = _this.m_logo;
-  if (logo.canvas) context.drawImage(logo.canvas, logo.x, logo.y);
+  if (logo.canvas) canvas.getContext('2d').drawImage(logo.canvas, logo.x, logo.y);
 
   var destSize = _this.m_size;
   var canvasTarget = options.reuseCanvas;
@@ -200,6 +188,33 @@ QRCanvas.prototype.m_draw = function () {
     canvasTarget = canvas;
   }
   return canvasTarget;
+};
+QRCanvas.prototype.m_drawForeground = function (options) {
+  var _this = this;
+  var cellSize = options.cellSize;
+  var size = options.size;
+  var effect = options.effect || {};
+  var draw = QRCanvas.m_getEffect(effect.key);
+  if (draw.foreground) {
+    return draw.foreground(assign({
+      mask: function () {
+        // mask is a canvas with basic rendered QRCode
+        var mask = getCanvas(size, size);
+        // draw mask without effects
+        _this.m_drawCells(mask, {
+          cellSize: cellSize,
+          count: options.count,
+        });
+        return mask;
+      },
+    }, options));
+  } else {
+    return drawCanvas(getCanvas(size, size), {
+      cellSize: cellSize,
+      size: size,
+      data: options.foreground,
+    });
+  }
 };
 QRCanvas.prototype.m_initLogo = function (canvas) {
   // limit the logo size
@@ -273,27 +288,20 @@ QRCanvas.prototype.m_drawCells = function (canvas, options) {
     count: count,
     context: canvas.getContext('2d'),
     value: effect.value || 0,
+    isDark: _this.m_isDark.bind(_this),
   };
   // draw qrcode according to effect
-  var drawCell = QRCanvas.m_effects[effect.key] || _this.m_drawSquare;
+  var draw = QRCanvas.m_getEffect(effect.key);
   // draw cells
   for (var i = 0; i < count; i ++) {
     for (var j = 0; j < count; j ++) {
-      drawCell.call(_this, {
+      draw.data({
         i: i,
         j: j,
         x: j * cellSize,
         y: i * cellSize,
       }, cellOptions);
     }
-  }
-};
-QRCanvas.prototype.m_drawSquare = function (cell, options) {
-  var context = options.context;
-  var cellSize = options.cellSize;
-  if (this.m_isDark(cell.i, cell.j)) {
-    context.fillStyle = QRCanvas.m_colorDark;
-    context.fillRect(cell.x, cell.y, cellSize, cellSize);
   }
 };
 /**
@@ -305,8 +313,7 @@ QRCanvas.prototype.m_transformColor = function (fg, bg, alpha) {
 QRCanvas.prototype.m_detectEdges = function () {};
 QRCanvas.prototype.m_clearLogo = function (canvas) {};
 QRCanvas.prototype.m_shouldTransclude = function (index) {
-  var _this = this;
-  if (_this.m_logo.clearEdges) {
+  if (this.m_logo.clearEdges) {
     return false;
   } else {
     return true;
