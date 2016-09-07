@@ -99,7 +99,6 @@
   function drawImageFore(options) {
     var cellSize = options.cellSize;
     var size = options.size;
-    var count = options.count;
     var mask = options.mask();
     var foreground = drawCanvas(getCanvas(size, size), {
       cellSize: cellSize,

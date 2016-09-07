@@ -45,13 +45,13 @@ Edger.prototype = {
     var pixelData = new Uint8Array(_this.total);
 
     // BFS
-    var queue = [];
+    var queue = [], i;
     var slice = [].slice;
-    for (var i = 0; i < _this.width; i ++) {
+    for (i = 0; i < _this.width; i ++) {
       checkSurroundings(i);
       checkSurroundings(_this.total - 1 - i);
     }
-    for (var i = 0; i < _this.height; i ++) {
+    for (i = 0; i < _this.height; i ++) {
       checkSurroundings(i * _this.width);
       checkSurroundings((i + 1) * _this.width - 1);
     }

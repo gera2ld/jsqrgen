@@ -311,8 +311,8 @@ QRCanvas.prototype.m_transformColor = function (fg, bg, alpha) {
   return ~~ (fg * alpha / 255 + bg * (255 - alpha) / 255);
 };
 QRCanvas.prototype.m_detectEdges = function () {};
-QRCanvas.prototype.m_clearLogo = function (canvas) {};
-QRCanvas.prototype.m_shouldTransclude = function (index) {
+QRCanvas.prototype.m_clearLogo = function (_canvas) {};
+QRCanvas.prototype.m_shouldTransclude = function (_index) {
   if (this.m_logo.clearEdges) {
     return false;
   } else {
@@ -320,7 +320,8 @@ QRCanvas.prototype.m_shouldTransclude = function (index) {
   }
 };
 
+/* eslint-disable */
 function qrcanvas(options) {
-  var qrcanvas = new QRCanvas(options)
+  var qrcanvas = new QRCanvas(options);
   return qrcanvas.m_draw();
 }

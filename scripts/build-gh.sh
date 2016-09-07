@@ -1,3 +1,4 @@
+set -e
 DEMO_DIR=dist
 rm -rf $DEMO_DIR
 npm run lint

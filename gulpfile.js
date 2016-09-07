@@ -4,6 +4,7 @@ const wrap = require('gulp-wrap');
 const concat = require('gulp-concat');
 const header = require('gulp-header');
 const uglify = require('gulp-uglify');
+const eslint = require('gulp-eslint');
 const pkg = require('./package.json');
 const isProd = process.env.NODE_ENV === 'production';
 const banner = `\
@@ -37,6 +38,18 @@ gulp.task('demo', () => {
 });
 
 gulp.task('default', ['build', 'demo']);
+
+gulp.task('lint', () => {
+  return gulp.src([
+    'src/**/*.js',
+    '!src/qrcode-light.js',
+  ])
+  .pipe(concat(`qrgen-lint.js`))
+  .pipe(gulp.dest('dist/'))
+  .pipe(eslint())
+  .pipe(eslint.format())
+  .pipe(eslint.failAfterError());
+});
 
 gulp.task('watch', ['default'], () => {
   gulp.watch('src/**/*.js', ['build']);
