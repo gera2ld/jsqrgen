@@ -1,7 +1,7 @@
 set -e
 DEMO_DIR=dist
-rm -rf $DEMO_DIR
 npm run lint
+rm -rf $DEMO_DIR
 npm run gulp --production
 cd $DEMO_DIR
 git init
