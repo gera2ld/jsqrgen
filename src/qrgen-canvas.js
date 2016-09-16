@@ -325,3 +325,5 @@ function qrcanvas(options) {
   var qrcanvas = new QRCanvas(options);
   return qrcanvas.m_draw();
 }
+
+qrcanvas.effects = QRCanvas.m_effects;
