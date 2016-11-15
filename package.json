@@ -6,6 +6,7 @@
   "author": "Gerald <i@gerald.top>",
   "license": "MIT",
   "main": "dist/qrgen.js",
+  "typings": "types/index.d.ts",
   "scripts": {
     "dev": "gulp watch",
     "gulp": "gulp",
